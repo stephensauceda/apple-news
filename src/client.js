@@ -231,6 +231,37 @@ export class AppleNewsClient {
   }
 
   /**
+   * @param {{ channelId: string, date?: string|Date }} options
+   */
+  async readChannelQuota(options) {
+    assertId(options?.channelId, 'channelId')
+    return this.#request(
+      'GET',
+      `/channels/${options.channelId}/quota`,
+      getSharedOptions(options)
+    )
+  }
+
+  /**
+   * @param {{ sectionId: string, articleIds: string[], date?: string|Date }} options
+   */
+  async promoteArticles(options) {
+    assertId(options?.sectionId, 'sectionId')
+
+    if (!Array.isArray(options?.articleIds)) {
+      throw new TypeError('articleIds is required and must be an array')
+    }
+
+    const body = JSON.stringify({ data: { promotedArticles: options.articleIds } })
+
+    return this.#request('POST', `/sections/${options.sectionId}/promotedArticles`, {
+      date: options.date,
+      contentType: 'application/json',
+      body
+    })
+  }
+
+  /**
    * @param {string} method
    * @param {string} endpoint
    * @param {{ date?: string|Date, query?: Record<string, string|number|boolean|undefined>, contentType?: string, body?: string|Buffer|Uint8Array|null }} [options]

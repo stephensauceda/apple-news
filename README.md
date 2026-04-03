@@ -41,6 +41,7 @@ console.log(channel)
 The client supports the following methods:
 
 - readChannel
+- readChannelQuota
 - listSections
 - readSection
 - createArticle
@@ -48,6 +49,7 @@ The client supports the following methods:
 - updateArticle
 - deleteArticle
 - searchArticles
+- promoteArticles
 
 ### Constructor
 
@@ -120,6 +122,28 @@ await client.createArticle({
     }
   }
 })
+```
+
+### readChannelQuota
+
+```js
+await client.readChannelQuota({ channelId: 'channel-id' })
+```
+
+Returns the channel's remaining create/update quota, queue size, and estimated wait time.
+
+### promoteArticles
+
+Sets the promoted articles list for a section (up to 6). Pass an empty array to clear promotions.
+
+```js
+await client.promoteArticles({
+  sectionId: 'section-id',
+  articleIds: ['article-id-1', 'article-id-2']
+})
+
+// Clear all promoted articles
+await client.promoteArticles({ sectionId: 'section-id', articleIds: [] })
 ```
 
 ### updateArticle

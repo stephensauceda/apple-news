@@ -227,4 +227,72 @@ describe('AppleNewsClient', () => {
       client.updateArticle({ revision: 'r1', article: { identifier: 'art1' } })
     ).rejects.toThrow('articleId is required')
   })
+
+  it('readChannelQuota calls correct endpoint', async () => {
+    const { client, fetchMock } = createClientWithResponse({
+      data: { quota: 100 }
+    })
+
+    const result = await client.readChannelQuota({ channelId: 'abc' })
+
+    expect(result).toEqual({ quota: 100 })
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      'https://news-api.apple.com/channels/abc/quota'
+    )
+    expect(fetchMock.mock.calls[0][1].method).toBe('GET')
+  })
+
+  it('readChannelQuota requires channelId', async () => {
+    const { client } = createClientWithResponse()
+
+    await expect(client.readChannelQuota({})).rejects.toThrow(
+      'channelId is required'
+    )
+  })
+
+  it('promoteArticles posts correct JSON body to section endpoint', async () => {
+    const { client, fetchMock } = createClientWithResponse({
+      data: { promotedArticles: ['id1', 'id2'] }
+    })
+
+    const result = await client.promoteArticles({
+      sectionId: 'sec1',
+      articleIds: ['id1', 'id2']
+    })
+
+    expect(result).toEqual({ promotedArticles: ['id1', 'id2'] })
+
+    const [url, opts] = fetchMock.mock.calls[0]
+    expect(url).toBe(
+      'https://news-api.apple.com/sections/sec1/promotedArticles'
+    )
+    expect(opts.method).toBe('POST')
+    expect(opts.headers['Content-Type']).toBe('application/json')
+
+    const body = JSON.parse(opts.body)
+    expect(body).toEqual({ data: { promotedArticles: ['id1', 'id2'] } })
+  })
+
+  it('promoteArticles accepts an empty array to clear promotions', async () => {
+    const { client, fetchMock } = createClientWithResponse({
+      data: { promotedArticles: [] }
+    })
+
+    await client.promoteArticles({ sectionId: 'sec1', articleIds: [] })
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(body).toEqual({ data: { promotedArticles: [] } })
+  })
+
+  it('promoteArticles requires sectionId and articleIds array', async () => {
+    const { client } = createClientWithResponse()
+
+    await expect(
+      client.promoteArticles({ articleIds: ['id1'] })
+    ).rejects.toThrow('sectionId is required')
+    await expect(
+      client.promoteArticles({ sectionId: 'sec1' })
+    ).rejects.toThrow('articleIds is required and must be an array')
+  })
 })
+

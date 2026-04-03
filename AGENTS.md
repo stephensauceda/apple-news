@@ -16,6 +16,7 @@ This file documents agent-specific implementation context for this repository an
 
 - Supported methods:
   - readChannel
+  - readChannelQuota
   - listSections
   - readSection
   - createArticle
@@ -23,6 +24,7 @@ This file documents agent-specific implementation context for this repository an
   - updateArticle
   - deleteArticle
   - searchArticles
+  - promoteArticles
 - Auth/signing correctness is a high-priority risk area and should be validated with focused tests.
 - Keep commits small and narrowly scoped to one concern.
 
