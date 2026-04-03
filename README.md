@@ -38,7 +38,7 @@ console.log(channel)
 
 ## API
 
-The client supports the milestone-one method scope from micnews/apple-news:
+The client supports the following methods:
 
 - readChannel
 - listSections

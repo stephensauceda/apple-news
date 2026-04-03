@@ -14,7 +14,7 @@ This file documents agent-specific implementation context for this repository an
 
 ## Current Scope and Priorities
 
-- Milestone one mirrors micnews/apple-news method scope:
+- Supported methods:
   - readChannel
   - listSections
   - readSection
