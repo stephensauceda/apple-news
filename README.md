@@ -1,5 +1,7 @@
 # @stephensauceda/apple-news
 
+[![codecov](https://codecov.io/github/stephensauceda/apple-news/graph/badge.svg?token=CWIFXDRP77)](https://codecov.io/github/stephensauceda/apple-news)
+
 Modern Node.js client for the Apple News API.
 
 - ESM-first package
