@@ -133,13 +133,16 @@ export async function requestSigned(options) {
 
   if (!response.ok) {
     const apiErrors = getApiErrors(parsedBody)
-    throw new AppleNewsApiError(`${options.method.toUpperCase()} ${options.endpoint} failed with status ${response.status}`, {
-      status: response.status,
-      method: options.method.toUpperCase(),
-      url,
-      apiErrors,
-      responseBody: parsedBody
-    })
+    throw new AppleNewsApiError(
+      `${options.method.toUpperCase()} ${options.endpoint} failed with status ${response.status}`,
+      {
+        status: response.status,
+        method: options.method.toUpperCase(),
+        url,
+        apiErrors,
+        responseBody: parsedBody
+      }
+    )
   }
 
   if (parsedBody === null) {

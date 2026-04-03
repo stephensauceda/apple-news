@@ -12,19 +12,27 @@ function createJsonResponse(status, body) {
 
 describe('buildRequestUrl', () => {
   it('builds a URL with query string values', () => {
-    const url = buildRequestUrl('news-api.apple.com', '/channels/abc/articles', {
-      limit: 10,
-      includeDeleted: false,
-      cursor: undefined
-    })
+    const url = buildRequestUrl(
+      'news-api.apple.com',
+      '/channels/abc/articles',
+      {
+        limit: 10,
+        includeDeleted: false,
+        cursor: undefined
+      }
+    )
 
-    expect(url).toBe('https://news-api.apple.com/channels/abc/articles?limit=10&includeDeleted=false')
+    expect(url).toBe(
+      'https://news-api.apple.com/channels/abc/articles?limit=10&includeDeleted=false'
+    )
   })
 })
 
 describe('requestSigned', () => {
   it('sends a signed request and unwraps data payload', async () => {
-    const fetchMock = vi.fn(async () => createJsonResponse(200, { data: { id: '123' } }))
+    const fetchMock = vi.fn(async () =>
+      createJsonResponse(200, { data: { id: '123' } })
+    )
     const apiSecret = Buffer.from('secret-value').toString('base64')
 
     const result = await requestSigned({
@@ -43,11 +51,17 @@ describe('requestSigned', () => {
     expect(calledUrl).toBe('https://news-api.apple.com/channels/abc')
     expect(calledOptions.method).toBe('GET')
     expect(calledOptions.headers.Accept).toBe('application/json')
-    expect(calledOptions.headers.Authorization).toContain('HHMAC; key="key-id"; signature="')
+    expect(calledOptions.headers.Authorization).toContain(
+      'HHMAC; key="key-id"; signature="'
+    )
   })
 
   it('returns null for successful empty responses', async () => {
-    const fetchMock = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }))
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 204,
+      text: async () => ''
+    }))
 
     const result = await requestSigned({
       apiId: 'key-id',
@@ -111,7 +125,9 @@ describe('requestSigned', () => {
   })
 
   it('passes content type and body for POST requests', async () => {
-    const fetchMock = vi.fn(async () => createJsonResponse(200, { data: { ok: true } }))
+    const fetchMock = vi.fn(async () =>
+      createJsonResponse(200, { data: { ok: true } })
+    )
     const body = JSON.stringify({ headline: 'hello' })
 
     await requestSigned({

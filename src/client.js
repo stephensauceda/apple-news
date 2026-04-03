@@ -1,4 +1,5 @@
 import { requestSigned } from './request.js'
+import { buildArticleMultipartBody } from './multipart.js'
 
 /**
  * @typedef AppleNewsClientConfig
@@ -18,6 +19,36 @@ function assertId(value, name) {
   if (!value || typeof value !== 'string') {
     throw new TypeError(`${name} is required and must be a non-empty string`)
   }
+}
+
+/**
+ * @param {{
+ *  isPreview?: boolean,
+ *  isSponsored?: boolean,
+ *  sections?: unknown,
+ *  maturityRating?: string,
+ *  revision?: string
+ * }} options
+ */
+function buildMetadata(options) {
+  const metadata = {
+    isPreview: options.isPreview ?? true,
+    isSponsored: options.isSponsored ?? false
+  }
+
+  if (options.sections !== undefined) {
+    metadata.sections = options.sections
+  }
+
+  if (options.maturityRating !== undefined) {
+    metadata.maturityRating = options.maturityRating
+  }
+
+  if (options.revision !== undefined) {
+    metadata.revision = options.revision
+  }
+
+  return metadata
 }
 
 /**
@@ -49,7 +80,11 @@ export class AppleNewsClient {
    */
   async readChannel(options) {
     assertId(options?.channelId, 'channelId')
-    return this.#request('GET', `/channels/${options.channelId}`, getSharedOptions(options))
+    return this.#request(
+      'GET',
+      `/channels/${options.channelId}`,
+      getSharedOptions(options)
+    )
   }
 
   /**
@@ -57,7 +92,11 @@ export class AppleNewsClient {
    */
   async listSections(options) {
     assertId(options?.channelId, 'channelId')
-    return this.#request('GET', `/channels/${options.channelId}/sections`, getSharedOptions(options))
+    return this.#request(
+      'GET',
+      `/channels/${options.channelId}/sections`,
+      getSharedOptions(options)
+    )
   }
 
   /**
@@ -65,7 +104,11 @@ export class AppleNewsClient {
    */
   async readSection(options) {
     assertId(options?.sectionId, 'sectionId')
-    return this.#request('GET', `/sections/${options.sectionId}`, getSharedOptions(options))
+    return this.#request(
+      'GET',
+      `/sections/${options.sectionId}`,
+      getSharedOptions(options)
+    )
   }
 
   /**
@@ -73,7 +116,11 @@ export class AppleNewsClient {
    */
   async readArticle(options) {
     assertId(options?.articleId, 'articleId')
-    return this.#request('GET', `/articles/${options.articleId}`, getSharedOptions(options))
+    return this.#request(
+      'GET',
+      `/articles/${options.articleId}`,
+      getSharedOptions(options)
+    )
   }
 
   /**
@@ -81,22 +128,32 @@ export class AppleNewsClient {
    */
   async deleteArticle(options) {
     assertId(options?.articleId, 'articleId')
-    return this.#request('DELETE', `/articles/${options.articleId}`, getSharedOptions(options))
+    return this.#request(
+      'DELETE',
+      `/articles/${options.articleId}`,
+      getSharedOptions(options)
+    )
   }
 
   /**
    * @param {{ channelId?: string, sectionId?: string, date?: string|Date, [key: string]: unknown }} options
    */
   async searchArticles(options) {
-    const hasChannelId = typeof options?.channelId === 'string' && options.channelId.length > 0
-    const hasSectionId = typeof options?.sectionId === 'string' && options.sectionId.length > 0
+    const hasChannelId =
+      typeof options?.channelId === 'string' && options.channelId.length > 0
+    const hasSectionId =
+      typeof options?.sectionId === 'string' && options.sectionId.length > 0
 
     if (!hasChannelId && !hasSectionId) {
-      throw new TypeError('searchArticles requires either channelId or sectionId')
+      throw new TypeError(
+        'searchArticles requires either channelId or sectionId'
+      )
     }
 
     if (hasChannelId && hasSectionId) {
-      throw new TypeError('searchArticles accepts either channelId or sectionId, not both')
+      throw new TypeError(
+        'searchArticles accepts either channelId or sectionId, not both'
+      )
     }
 
     const endpoint = hasChannelId
@@ -116,19 +173,61 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ channelId: string }} _options
+   * @param {{
+   *  channelId: string,
+   *  article: Record<string, unknown>,
+   *  bundleFiles?: Record<string, { data: Buffer|Uint8Array|string, mimeType?: string }>,
+   *  isPreview?: boolean,
+   *  isSponsored?: boolean,
+   *  sections?: unknown,
+   *  maturityRating?: string,
+   *  date?: string|Date
+   * }} options
    */
   async createArticle(options) {
-    void options
-    throw new Error('createArticle is not implemented yet')
+    assertId(options?.channelId, 'channelId')
+
+    const multipart = buildArticleMultipartBody({
+      article: options.article,
+      metadata: buildMetadata(options),
+      bundleFiles: options.bundleFiles
+    })
+
+    return this.#request('POST', `/channels/${options.channelId}/articles`, {
+      date: options.date,
+      contentType: multipart.contentType,
+      body: multipart.body
+    })
   }
 
   /**
-   * @param {{ articleId: string }} _options
+   * @param {{
+   *  articleId: string,
+   *  revision: string,
+   *  article: Record<string, unknown>,
+   *  bundleFiles?: Record<string, { data: Buffer|Uint8Array|string, mimeType?: string }>,
+   *  isPreview?: boolean,
+   *  isSponsored?: boolean,
+   *  sections?: unknown,
+   *  maturityRating?: string,
+   *  date?: string|Date
+   * }} options
    */
   async updateArticle(options) {
-    void options
-    throw new Error('updateArticle is not implemented yet')
+    assertId(options?.articleId, 'articleId')
+    assertId(options?.revision, 'revision')
+
+    const multipart = buildArticleMultipartBody({
+      article: options.article,
+      metadata: buildMetadata(options),
+      bundleFiles: options.bundleFiles
+    })
+
+    return this.#request('POST', `/articles/${options.articleId}`, {
+      date: options.date,
+      contentType: multipart.contentType,
+      body: multipart.body
+    })
   }
 
   /**
