@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { suite, expect, test, vi } from 'vitest'
 import { AppleNewsClient } from './client.js'
 
 function createClientWithResponse(responseBody = { data: { ok: true } }) {
@@ -17,8 +17,8 @@ function createClientWithResponse(responseBody = { data: { ok: true } }) {
   return { client, fetchMock }
 }
 
-describe('AppleNewsClient', () => {
-  it('requires apiId and apiSecret', () => {
+suite('AppleNewsClient', () => {
+  test('requires apiId and apiSecret', () => {
     expect(() => new AppleNewsClient({ apiSecret: 'x' })).toThrow(
       'apiId is required'
     )
@@ -27,7 +27,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('readChannel calls correct endpoint', async () => {
+  test('readChannel calls correct endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { id: 'channel' }
     })
@@ -41,7 +41,7 @@ describe('AppleNewsClient', () => {
     expect(fetchMock.mock.calls[0][1].method).toBe('GET')
   })
 
-  it('listSections calls correct endpoint', async () => {
+  test('listSections calls correct endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: [{ id: 'sec1' }]
     })
@@ -54,7 +54,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('readSection calls correct endpoint', async () => {
+  test('readSection calls correct endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { id: 'sec1' }
     })
@@ -66,7 +66,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('readArticle calls correct endpoint', async () => {
+  test('readArticle calls correct endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { id: 'art1' }
     })
@@ -78,7 +78,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('deleteArticle sends DELETE request', async () => {
+  test('deleteArticle sends DELETE request', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 204,
@@ -96,7 +96,7 @@ describe('AppleNewsClient', () => {
     expect(fetchMock.mock.calls[0][1].method).toBe('DELETE')
   })
 
-  it('searchArticles supports channel scope', async () => {
+  test('searchArticles supports channel scope', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: [{ id: 'art1' }]
     })
@@ -108,7 +108,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('searchArticles supports section scope', async () => {
+  test('searchArticles supports section scope', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: [{ id: 'art1' }]
     })
@@ -120,7 +120,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('searchArticles requires exactly one scope id', async () => {
+  test('searchArticles requires exactly one scope id', async () => {
     const { client } = createClientWithResponse()
 
     await expect(client.searchArticles({})).rejects.toThrow(
@@ -131,7 +131,7 @@ describe('AppleNewsClient', () => {
     ).rejects.toThrow('accepts either channelId or sectionId, not both')
   })
 
-  it('preserves host override', async () => {
+  test('preserves host override', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -152,7 +152,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('createArticle posts multipart payload to channel articles endpoint', async () => {
+  test('createArticle posts multipart payload to channel articles endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { id: 'art1' }
     })
@@ -182,7 +182,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('updateArticle requires revision and includes it in metadata', async () => {
+  test('updateArticle requires revision and includes it in metadata', async () => {
     const { client } = createClientWithResponse()
 
     await expect(
@@ -193,7 +193,7 @@ describe('AppleNewsClient', () => {
     ).rejects.toThrow('revision is required')
   })
 
-  it('updateArticle posts multipart payload to article endpoint', async () => {
+  test('updateArticle posts multipart payload to article endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { id: 'art1', revision: 'r2' }
     })
@@ -214,7 +214,7 @@ describe('AppleNewsClient', () => {
     expect(bodyText).toContain('"maturityRating":"GENERAL"')
   })
 
-  it('createArticle and updateArticle require ids and article payloads', async () => {
+  test('createArticle and updateArticle require ids and article payloads', async () => {
     const { client } = createClientWithResponse()
 
     await expect(
@@ -228,7 +228,7 @@ describe('AppleNewsClient', () => {
     ).rejects.toThrow('articleId is required')
   })
 
-  it('readChannelQuota calls correct endpoint', async () => {
+  test('readChannelQuota calls correct endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { quota: 100 }
     })
@@ -242,7 +242,7 @@ describe('AppleNewsClient', () => {
     expect(fetchMock.mock.calls[0][1].method).toBe('GET')
   })
 
-  it('readChannelQuota requires channelId', async () => {
+  test('readChannelQuota requires channelId', async () => {
     const { client } = createClientWithResponse()
 
     await expect(client.readChannelQuota({})).rejects.toThrow(
@@ -250,7 +250,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('promoteArticles posts correct JSON body to section endpoint', async () => {
+  test('promoteArticles posts correct JSON body to section endpoint', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { promotedArticles: ['id1', 'id2'] }
     })
@@ -273,7 +273,7 @@ describe('AppleNewsClient', () => {
     expect(body).toEqual({ data: { promotedArticles: ['id1', 'id2'] } })
   })
 
-  it('promoteArticles accepts an empty array to clear promotions', async () => {
+  test('promoteArticles accepts an empty array to clear promotions', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: { promotedArticles: [] }
     })
@@ -284,7 +284,7 @@ describe('AppleNewsClient', () => {
     expect(body).toEqual({ data: { promotedArticles: [] } })
   })
 
-  it('promoteArticles requires sectionId and articleIds array', async () => {
+  test('promoteArticles requires sectionId and articleIds array', async () => {
     const { client } = createClientWithResponse()
 
     await expect(
@@ -295,7 +295,7 @@ describe('AppleNewsClient', () => {
     )
   })
 
-  it('propagates AppleNewsApiError from failed API responses', async () => {
+  test('propagates AppleNewsApiError from failed API responses', async () => {
     const { AppleNewsApiError } = await import('./request.js')
 
     const fetchMock = vi.fn(async () => ({

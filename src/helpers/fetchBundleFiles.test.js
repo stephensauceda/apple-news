@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from 'vitest'
+import { suite, expect, test, vi } from 'vitest'
 import { fetchBundleFiles } from './fetchBundleFiles.js'
 
-describe('fetchBundleFiles', () => {
-  it('downloads files and returns buffer + mimeType map', async () => {
+suite('fetchBundleFiles', () => {
+  test('downloads files and returns buffer + mimeType map', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -24,7 +24,7 @@ describe('fetchBundleFiles', () => {
     expect(result['image.jpg'].mimeType).toBe('image/jpeg')
   })
 
-  it('falls back to octet-stream when content-type is missing', async () => {
+  test('falls back to octet-stream when content-type is missing', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -44,7 +44,7 @@ describe('fetchBundleFiles', () => {
     expect(result['blob.bin'].mimeType).toBe('application/octet-stream')
   })
 
-  it('throws when a remote fetch fails', async () => {
+  test('throws when a remote fetch fails', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: false,
       status: 404,

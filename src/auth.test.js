@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto'
-import { describe, expect, it } from 'vitest'
+import { suite, expect, test } from 'vitest'
 import {
   buildAuthorizationHeader,
   buildCanonicalRequest,
@@ -8,15 +8,15 @@ import {
   signCanonicalRequest
 } from '../src/auth.js'
 
-describe('formatAppleDate', () => {
-  it('drops milliseconds to match Apple date format', () => {
+suite('formatAppleDate', () => {
+  test('drops milliseconds to match Apple date format', () => {
     const value = formatAppleDate(new Date('2026-04-03T11:22:33.444Z'))
     expect(value).toBe('2026-04-03T11:22:33Z')
   })
 })
 
-describe('buildCanonicalRequest', () => {
-  it('builds canonical payload for GET requests', () => {
+suite('buildCanonicalRequest', () => {
+  test('builds canonical payload for GET requests', () => {
     const payload = buildCanonicalRequest({
       method: 'get',
       url: 'https://news-api.apple.com/channels/abc',
@@ -28,7 +28,7 @@ describe('buildCanonicalRequest', () => {
     )
   })
 
-  it('includes content type and body for POST requests', () => {
+  test('includes content type and body for POST requests', () => {
     const payload = buildCanonicalRequest({
       method: 'POST',
       url: 'https://news-api.apple.com/channels/abc/articles',
@@ -42,7 +42,7 @@ describe('buildCanonicalRequest', () => {
     )
   })
 
-  it('accepts Uint8Array bodies', () => {
+  test('accepts Uint8Array bodies', () => {
     const payload = buildCanonicalRequest({
       method: 'POST',
       url: 'https://news-api.apple.com/channels/abc/articles',
@@ -57,8 +57,8 @@ describe('buildCanonicalRequest', () => {
   })
 })
 
-describe('signCanonicalRequest', () => {
-  it('matches Node HMAC sha256 base64 output', () => {
+suite('signCanonicalRequest', () => {
+  test('matches Node HMAC sha256 base64 output', () => {
     const secret = Buffer.from('top-secret').toString('base64')
     const payload = Buffer.from('canonical-payload', 'utf8')
 
@@ -71,8 +71,8 @@ describe('signCanonicalRequest', () => {
   })
 })
 
-describe('buildAuthorizationHeader', () => {
-  it('returns HHMAC formatted header', () => {
+suite('buildAuthorizationHeader', () => {
+  test('returns HHMAC formatted header', () => {
     const header = buildAuthorizationHeader({
       apiId: 'my-key-id',
       signature: 'abc123',
@@ -85,8 +85,8 @@ describe('buildAuthorizationHeader', () => {
   })
 })
 
-describe('signCanonicalRequest known-signature fixture', () => {
-  it('produces a deterministic HMAC-SHA256 signature for a fixed input', () => {
+suite('signCanonicalRequest known-signature fixture', () => {
+  test('produces a deterministic HMAC-SHA256 signature for a fixed input', () => {
     // Fixed inputs — any change to the signing logic will break this test.
     // Secret is the base64 encoding of the string "test-secret-value".
     const apiSecret = Buffer.from('test-secret-value').toString('base64')
@@ -110,8 +110,8 @@ describe('signCanonicalRequest known-signature fixture', () => {
   })
 })
 
-describe('createSignedHeaders', () => {
-  it('creates authorization and accept headers for GET', () => {
+suite('createSignedHeaders', () => {
+  test('creates authorization and accept headers for GET', () => {
     const result = createSignedHeaders({
       apiId: 'key-id',
       apiSecret: Buffer.from('secret-value').toString('base64'),
@@ -129,7 +129,7 @@ describe('createSignedHeaders', () => {
     expect(result.headers['Content-Type']).toBeUndefined()
   })
 
-  it('includes content type when provided', () => {
+  test('includes content type when provided', () => {
     const result = createSignedHeaders({
       apiId: 'key-id',
       apiSecret: Buffer.from('secret-value').toString('base64'),

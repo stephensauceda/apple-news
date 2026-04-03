@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { suite, expect, test } from 'vitest'
 import { buildArticleMultipartBody } from './multipart.js'
 
-describe('buildArticleMultipartBody', () => {
-  it('includes article.json and metadata parts', () => {
+suite('buildArticleMultipartBody', () => {
+  test('includes article.json and metadata parts', () => {
     const result = buildArticleMultipartBody({
       article: { identifier: 'abc', title: 'Title' },
       metadata: { isPreview: true },
@@ -20,7 +20,7 @@ describe('buildArticleMultipartBody', () => {
     expect(text).toContain('{"data":{"isPreview":true}}')
   })
 
-  it('adds bundle files as fileN parts with filenames', () => {
+  test('adds bundle files as fileN parts with filenames', () => {
     const result = buildArticleMultipartBody({
       article: { identifier: 'abc' },
       bundleFiles: {
@@ -38,7 +38,7 @@ describe('buildArticleMultipartBody', () => {
     expect(text).toContain('Content-Type: font/otf')
   })
 
-  it('rejects reserved bundle filenames', () => {
+  test('rejects reserved bundle filenames', () => {
     expect(() =>
       buildArticleMultipartBody({
         article: { identifier: 'abc' },
@@ -49,13 +49,13 @@ describe('buildArticleMultipartBody', () => {
     ).toThrow('reserved names')
   })
 
-  it('requires article object', () => {
+  test('requires article object', () => {
     expect(() => buildArticleMultipartBody({ article: null })).toThrow(
       'article is required'
     )
   })
 
-  it('accepts Uint8Array bundle file data', () => {
+  test('accepts Uint8Array bundle file data', () => {
     const result = buildArticleMultipartBody({
       article: { identifier: 'abc' },
       bundleFiles: {
@@ -71,7 +71,7 @@ describe('buildArticleMultipartBody', () => {
     expect(result.body.toString('utf8')).toContain('filename="image.png"')
   })
 
-  it('accepts string bundle file data', () => {
+  test('accepts string bundle file data', () => {
     const result = buildArticleMultipartBody({
       article: { identifier: 'abc' },
       bundleFiles: {

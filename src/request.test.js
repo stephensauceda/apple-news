@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { suite, expect, test, vi } from 'vitest'
 import { createSignedHeaders } from './auth.js'
 import { AppleNewsApiError, buildRequestUrl, requestSigned } from './request.js'
 
@@ -10,8 +10,8 @@ function createJsonResponse(status, body) {
   }
 }
 
-describe('buildRequestUrl', () => {
-  it('builds a URL with query string values', () => {
+suite('buildRequestUrl', () => {
+  test('builds a URL with query string values', () => {
     const url = buildRequestUrl(
       'news-api.apple.com',
       '/channels/abc/articles',
@@ -28,8 +28,8 @@ describe('buildRequestUrl', () => {
   })
 })
 
-describe('requestSigned', () => {
-  it('sends a signed request and unwraps data payload', async () => {
+suite('requestSigned', () => {
+  test('sends a signed request and unwraps data payload', async () => {
     const fetchMock = vi.fn(async () =>
       createJsonResponse(200, { data: { id: '123' } })
     )
@@ -56,7 +56,7 @@ describe('requestSigned', () => {
     )
   })
 
-  it('returns null for successful empty responses', async () => {
+  test('returns null for successful empty responses', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 204,
@@ -75,7 +75,7 @@ describe('requestSigned', () => {
     expect(result).toBeNull()
   })
 
-  it('uses full URL including query in signing', async () => {
+  test('uses full URL including query in signing', async () => {
     const fetchMock = vi.fn(async () => createJsonResponse(200, { data: [] }))
     const apiSecret = Buffer.from('secret-value').toString('base64')
 
@@ -101,7 +101,7 @@ describe('requestSigned', () => {
     expect(options.headers.Authorization).toBe(expected.headers.Authorization)
   })
 
-  it('throws AppleNewsApiError for non-2xx responses', async () => {
+  test('throws AppleNewsApiError for non-2xx responses', async () => {
     const fetchMock = vi.fn(async () =>
       createJsonResponse(401, {
         errors: [{ code: 'UNAUTHORIZED', message: 'Invalid auth' }]
@@ -124,7 +124,7 @@ describe('requestSigned', () => {
     })
   })
 
-  it('passes content type and body for POST requests', async () => {
+  test('passes content type and body for POST requests', async () => {
     const fetchMock = vi.fn(async () =>
       createJsonResponse(200, { data: { ok: true } })
     )
@@ -146,7 +146,7 @@ describe('requestSigned', () => {
     expect(options.body).toBe(body)
   })
 
-  it('exports an error class suitable for instanceof checks', () => {
+  test('exports an error class suitable for instanceof checks', () => {
     const error = new AppleNewsApiError('test', {
       status: 400,
       method: 'GET',
@@ -156,7 +156,7 @@ describe('requestSigned', () => {
     expect(error instanceof AppleNewsApiError).toBe(true)
   })
 
-  it('handles non-JSON error response body gracefully', async () => {
+  test('handles non-JSON error response body gracefully', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: false,
       status: 503,
@@ -178,7 +178,7 @@ describe('requestSigned', () => {
     expect(error.apiErrors).toBeUndefined()
   })
 
-  it('returns object as-is when response has no data wrapper', async () => {
+  test('returns object as-is when response has no data wrapper', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 200,
