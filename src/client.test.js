@@ -153,7 +153,9 @@ describe('AppleNewsClient', () => {
   })
 
   it('createArticle posts multipart payload to channel articles endpoint', async () => {
-    const { client, fetchMock } = createClientWithResponse({ data: { id: 'art1' } })
+    const { client, fetchMock } = createClientWithResponse({
+      data: { id: 'art1' }
+    })
 
     const result = await client.createArticle({
       channelId: 'abc',
@@ -166,14 +168,18 @@ describe('AppleNewsClient', () => {
     const [url, options] = fetchMock.mock.calls[0]
     expect(url).toBe('https://news-api.apple.com/channels/abc/articles')
     expect(options.method).toBe('POST')
-    expect(options.headers['Content-Type']).toContain('multipart/form-data; boundary=')
+    expect(options.headers['Content-Type']).toContain(
+      'multipart/form-data; boundary='
+    )
     expect(Buffer.isBuffer(options.body)).toBe(true)
 
     const bodyText = options.body.toString('utf8')
     expect(bodyText).toContain('name="article.json"')
     expect(bodyText).toContain('name="metadata"')
     expect(bodyText).toContain('{"identifier":"art1","title":"Title"}')
-    expect(bodyText).toContain('{"data":{"isPreview":true,"isSponsored":false,"sections":["sec1"]}}')
+    expect(bodyText).toContain(
+      '{"data":{"isPreview":true,"isSponsored":false,"sections":["sec1"]}}'
+    )
   })
 
   it('updateArticle requires revision and includes it in metadata', async () => {
@@ -188,7 +194,9 @@ describe('AppleNewsClient', () => {
   })
 
   it('updateArticle posts multipart payload to article endpoint', async () => {
-    const { client, fetchMock } = createClientWithResponse({ data: { id: 'art1', revision: 'r2' } })
+    const { client, fetchMock } = createClientWithResponse({
+      data: { id: 'art1', revision: 'r2' }
+    })
 
     await client.updateArticle({
       articleId: 'art1',
@@ -209,12 +217,14 @@ describe('AppleNewsClient', () => {
   it('createArticle and updateArticle require ids and article payloads', async () => {
     const { client } = createClientWithResponse()
 
-    await expect(client.createArticle({ article: { identifier: 'art1' } })).rejects.toThrow(
-      'channelId is required'
+    await expect(
+      client.createArticle({ article: { identifier: 'art1' } })
+    ).rejects.toThrow('channelId is required')
+    await expect(client.createArticle({ channelId: 'abc' })).rejects.toThrow(
+      'article is required'
     )
-    await expect(client.createArticle({ channelId: 'abc' })).rejects.toThrow('article is required')
-    await expect(client.updateArticle({ revision: 'r1', article: { identifier: 'art1' } })).rejects.toThrow(
-      'articleId is required'
-    )
+    await expect(
+      client.updateArticle({ revision: 'r1', article: { identifier: 'art1' } })
+    ).rejects.toThrow('articleId is required')
   })
 })
