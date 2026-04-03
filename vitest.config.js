@@ -8,6 +8,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
       include: ['src/**/*.js'],
+      exclude: ['src/index.js', 'src/helpers/index.js'],
       thresholds: {
         statements: 90,
         branches: 90,
