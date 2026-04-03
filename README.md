@@ -16,7 +16,7 @@ npm install @stephensauceda/apple-news
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 22+
 - Apple News API key ID and secret from Apple News Publisher
 
 ## Quick Start

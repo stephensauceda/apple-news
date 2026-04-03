@@ -5,7 +5,7 @@ This file documents agent-specific implementation context for this repository an
 ## Project Snapshot
 
 - Package: @stephensauceda/apple-news
-- Runtime target: Node.js 20+
+- Runtime target: Node.js 22+
 - Module format: ESM
 - Source language: JavaScript with JSDoc
 - Bundler: esbuild
@@ -49,6 +49,7 @@ Update this section when architecture or behavior decisions change.
 - 2026-04-03: Co-locate tests with source modules under src using \*.test.js naming.
 - 2026-04-03: Implement signed HTTP transport as a separate request module with injectable fetch for deterministic tests.
 - 2026-04-03: Build multipart request bodies manually to guarantee canonical-signature bytes exactly match uploaded payload bytes.
+- 2026-04-03: Raised minimum runtime target from Node 20 to Node 22 due upcoming Node 20 EOL.
 
 ## Reference Docs
 
