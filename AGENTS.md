@@ -46,6 +46,7 @@ Update this section when architecture or behavior decisions change.
 - 2026-04-03: Core bundle handling accepts buffers/file payloads; URL downloading is an optional helper.
 - 2026-04-03: Use tsup for library builds.
 - 2026-04-03: Add ESLint and Prettier rules enforcing no trailing commas and no semicolons.
+- 2026-04-03: Co-locate tests with source modules under src using *.test.js naming.
 
 ## Reference Docs
 
