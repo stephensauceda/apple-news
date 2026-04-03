@@ -7,3 +7,4 @@ export {
 } from './auth.js'
 
 export { AppleNewsApiError, buildRequestUrl, requestSigned } from './request.js'
+export { AppleNewsClient } from './client.js'
