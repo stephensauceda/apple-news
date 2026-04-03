@@ -46,7 +46,7 @@ Update this section when architecture or behavior decisions change.
 - 2026-04-03: Core bundle handling accepts buffers/file payloads; URL downloading is an optional helper.
 - 2026-04-03: Switched from tsup to esbuild to avoid TypeScript runtime dependency in build tooling.
 - 2026-04-03: Add ESLint and Prettier rules enforcing no trailing commas and no semicolons.
-- 2026-04-03: Co-locate tests with source modules under src using *.test.js naming.
+- 2026-04-03: Co-locate tests with source modules under src using \*.test.js naming.
 - 2026-04-03: Implement signed HTTP transport as a separate request module with injectable fetch for deterministic tests.
 - 2026-04-03: Build multipart request bodies manually to guarantee canonical-signature bytes exactly match uploaded payload bytes.
 

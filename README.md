@@ -25,8 +25,8 @@ npm install @stephensauceda/apple-news
 import { AppleNewsClient } from '@stephensauceda/apple-news'
 
 const client = new AppleNewsClient({
-	apiId: process.env.APPLE_NEWS_API_ID,
-	apiSecret: process.env.APPLE_NEWS_API_SECRET
+  apiId: process.env.APPLE_NEWS_API_ID,
+  apiSecret: process.env.APPLE_NEWS_API_SECRET
 })
 
 const channel = await client.readChannel({ channelId: 'your-channel-id' })
@@ -50,9 +50,9 @@ The client supports the milestone-one method scope from micnews/apple-news:
 
 ```js
 const client = new AppleNewsClient({
-	apiId: 'your-api-key-id',
-	apiSecret: 'your-base64-secret',
-	host: 'news-api.apple.com' // optional
+  apiId: 'your-api-key-id',
+  apiSecret: 'your-base64-secret',
+  host: 'news-api.apple.com' // optional
 })
 ```
 
@@ -99,21 +99,23 @@ await client.searchArticles({ sectionId: 'section-id', offset: 50 })
 
 ```js
 await client.createArticle({
-	channelId: 'channel-id',
-	article: {
-		identifier: 'article-id',
-		title: 'Title'
-	},
-	sections: ['section-id'],
-	isPreview: true,
-	isSponsored: false,
-	maturityRating: 'GENERAL',
-	bundleFiles: {
-		'image.jpg': {
-			data: Buffer.from([/* bytes */]),
-			mimeType: 'image/jpeg'
-		}
-	}
+  channelId: 'channel-id',
+  article: {
+    identifier: 'article-id',
+    title: 'Title'
+  },
+  sections: ['section-id'],
+  isPreview: true,
+  isSponsored: false,
+  maturityRating: 'GENERAL',
+  bundleFiles: {
+    'image.jpg': {
+      data: Buffer.from([
+        /* bytes */
+      ]),
+      mimeType: 'image/jpeg'
+    }
+  }
 })
 ```
 
@@ -123,18 +125,20 @@ revision is required.
 
 ```js
 await client.updateArticle({
-	articleId: 'article-id',
-	revision: 'current-revision',
-	article: {
-		identifier: 'article-id',
-		title: 'Updated title'
-	},
-	bundleFiles: {
-		'image.jpg': {
-			data: Buffer.from([/* bytes */]),
-			mimeType: 'image/jpeg'
-		}
-	}
+  articleId: 'article-id',
+  revision: 'current-revision',
+  article: {
+    identifier: 'article-id',
+    title: 'Updated title'
+  },
+  bundleFiles: {
+    'image.jpg': {
+      data: Buffer.from([
+        /* bytes */
+      ]),
+      mimeType: 'image/jpeg'
+    }
+  }
 })
 ```
 
@@ -147,8 +151,8 @@ If you want convenience URL downloading, use the helper:
 import { fetchBundleFiles } from '@stephensauceda/apple-news'
 
 const bundleFiles = await fetchBundleFiles({
-	'image.jpg': 'https://example.com/image.jpg',
-	'font.otf': 'https://example.com/font.otf'
+  'image.jpg': 'https://example.com/image.jpg',
+  'font.otf': 'https://example.com/font.otf'
 })
 ```
 
@@ -166,12 +170,12 @@ Non-2xx responses throw AppleNewsApiError with:
 import { AppleNewsApiError } from '@stephensauceda/apple-news'
 
 try {
-	await client.readChannel({ channelId: 'channel-id' })
+  await client.readChannel({ channelId: 'channel-id' })
 } catch (error) {
-	if (error instanceof AppleNewsApiError) {
-		console.error(error.status, error.apiErrors)
-	}
-	throw error
+  if (error instanceof AppleNewsApiError) {
+    console.error(error.status, error.apiErrors)
+  }
+  throw error
 }
 ```
 

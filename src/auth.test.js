@@ -23,7 +23,9 @@ describe('buildCanonicalRequest', () => {
       date: '2026-04-03T11:22:33Z'
     })
 
-    expect(payload.toString('utf8')).toBe('GEThttps://news-api.apple.com/channels/abc2026-04-03T11:22:33Z')
+    expect(payload.toString('utf8')).toBe(
+      'GEThttps://news-api.apple.com/channels/abc2026-04-03T11:22:33Z'
+    )
   })
 
   it('includes content type and body for POST requests', () => {
@@ -35,7 +37,9 @@ describe('buildCanonicalRequest', () => {
       body: '{"x":1}'
     })
 
-    expect(payload.toString('utf8')).toBe('POSThttps://news-api.apple.com/channels/abc/articles2026-04-03T11:22:33Zapplication/json{"x":1}')
+    expect(payload.toString('utf8')).toBe(
+      'POSThttps://news-api.apple.com/channels/abc/articles2026-04-03T11:22:33Zapplication/json{"x":1}'
+    )
   })
 
   it('accepts Uint8Array bodies', () => {
@@ -47,7 +51,9 @@ describe('buildCanonicalRequest', () => {
       body: new Uint8Array([65, 66, 67])
     })
 
-    expect(payload.toString('utf8')).toBe('POSThttps://news-api.apple.com/channels/abc/articles2026-04-03T11:22:33Zapplication/octet-streamABC')
+    expect(payload.toString('utf8')).toBe(
+      'POSThttps://news-api.apple.com/channels/abc/articles2026-04-03T11:22:33Zapplication/octet-streamABC'
+    )
   })
 })
 
@@ -56,7 +62,9 @@ describe('signCanonicalRequest', () => {
     const secret = Buffer.from('top-secret').toString('base64')
     const payload = Buffer.from('canonical-payload', 'utf8')
 
-    const expected = createHmac('sha256', Buffer.from(secret, 'base64')).update(payload).digest('base64')
+    const expected = createHmac('sha256', Buffer.from(secret, 'base64'))
+      .update(payload)
+      .digest('base64')
     const actual = signCanonicalRequest(secret, payload)
 
     expect(actual).toBe(expected)
@@ -71,7 +79,9 @@ describe('buildAuthorizationHeader', () => {
       date: '2026-04-03T11:22:33Z'
     })
 
-    expect(header).toBe('HHMAC; key="my-key-id"; signature="abc123"; date="2026-04-03T11:22:33Z"')
+    expect(header).toBe(
+      'HHMAC; key="my-key-id"; signature="abc123"; date="2026-04-03T11:22:33Z"'
+    )
   })
 })
 
@@ -86,7 +96,11 @@ describe('createSignedHeaders', () => {
     })
 
     expect(result.headers.Accept).toBe('application/json')
-    expect(result.headers.Authorization.startsWith('HHMAC; key="key-id"; signature="')).toBe(true)
+    expect(
+      result.headers.Authorization.startsWith(
+        'HHMAC; key="key-id"; signature="'
+      )
+    ).toBe(true)
     expect(result.headers['Content-Type']).toBeUndefined()
   })
 
@@ -101,7 +115,11 @@ describe('createSignedHeaders', () => {
       body: Buffer.from('payload')
     })
 
-    expect(result.headers['Content-Type']).toBe('multipart/form-data; boundary=test')
-    expect(result.canonicalPayload.toString('utf8')).toContain('multipart/form-data; boundary=test')
+    expect(result.headers['Content-Type']).toBe(
+      'multipart/form-data; boundary=test'
+    )
+    expect(result.canonicalPayload.toString('utf8')).toContain(
+      'multipart/form-data; boundary=test'
+    )
   })
 })
