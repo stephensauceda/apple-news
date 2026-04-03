@@ -32,7 +32,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node ./scripts/build.mjs",
+    "build": "node ./local/scripts/build.mjs",
     "clean": "rm -rf dist coverage",
     "lint": "eslint .",
     "format": "prettier --write .",
