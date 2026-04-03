@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`signCanonicalRequest known-signature fixture > produces a deterministic HMAC-SHA256 signature for a fixed input 1`] = `"oLgb2BN0u1SQcmwvqqmWIS7LphVSAT5C8xGJrAWuboU="`;

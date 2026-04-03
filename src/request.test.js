@@ -155,4 +155,45 @@ describe('requestSigned', () => {
 
     expect(error instanceof AppleNewsApiError).toBe(true)
   })
+
+  it('handles non-JSON error response body gracefully', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: false,
+      status: 503,
+      text: async () => '<html>Service Unavailable</html>'
+    }))
+
+    const error = await requestSigned({
+      apiId: 'key-id',
+      apiSecret: Buffer.from('secret-value').toString('base64'),
+      method: 'GET',
+      endpoint: '/channels/abc',
+      date: '2026-04-03T11:22:33Z',
+      fetchImpl: fetchMock
+    }).catch((e) => e)
+
+    expect(error).toBeInstanceOf(AppleNewsApiError)
+    expect(error.status).toBe(503)
+    expect(error.responseBody).toBe('<html>Service Unavailable</html>')
+    expect(error.apiErrors).toBeUndefined()
+  })
+
+  it('returns object as-is when response has no data wrapper', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ throttling: { quota: 5 } })
+    }))
+
+    const result = await requestSigned({
+      apiId: 'key-id',
+      apiSecret: Buffer.from('secret-value').toString('base64'),
+      method: 'GET',
+      endpoint: '/channels/abc/quota',
+      date: '2026-04-03T11:22:33Z',
+      fetchImpl: fetchMock
+    })
+
+    expect(result).toEqual({ throttling: { quota: 5 } })
+  })
 })

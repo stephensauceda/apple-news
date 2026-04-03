@@ -85,6 +85,31 @@ describe('buildAuthorizationHeader', () => {
   })
 })
 
+describe('signCanonicalRequest known-signature fixture', () => {
+  it('produces a deterministic HMAC-SHA256 signature for a fixed input', () => {
+    // Fixed inputs — any change to the signing logic will break this test.
+    // Secret is the base64 encoding of the string "test-secret-value".
+    const apiSecret = Buffer.from('test-secret-value').toString('base64')
+    const canonicalPayload = buildCanonicalRequest({
+      method: 'GET',
+      url: 'https://news-api.apple.com/channels/63a75491-2c4d-3530-af91-819be8c3ace0',
+      date: '2026-04-03T12:00:00Z'
+    })
+
+    const signature = signCanonicalRequest(apiSecret, canonicalPayload)
+
+    // Derive expected independently using Node crypto directly.
+    const key = Buffer.from(apiSecret, 'base64')
+    const expected = createHmac('sha256', key)
+      .update(canonicalPayload)
+      .digest('base64')
+
+    expect(signature).toBe(expected)
+    // Pin the value so regressions are immediately visible.
+    expect(signature).toMatchSnapshot()
+  })
+})
+
 describe('createSignedHeaders', () => {
   it('creates authorization and accept headers for GET', () => {
     const result = createSignedHeaders({

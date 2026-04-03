@@ -290,9 +290,35 @@ describe('AppleNewsClient', () => {
     await expect(
       client.promoteArticles({ articleIds: ['id1'] })
     ).rejects.toThrow('sectionId is required')
-    await expect(
-      client.promoteArticles({ sectionId: 'sec1' })
-    ).rejects.toThrow('articleIds is required and must be an array')
+    await expect(client.promoteArticles({ sectionId: 'sec1' })).rejects.toThrow(
+      'articleIds is required and must be an array'
+    )
+  })
+
+  it('propagates AppleNewsApiError from failed API responses', async () => {
+    const { AppleNewsApiError } = await import('./request.js')
+
+    const fetchMock = vi.fn(async () => ({
+      ok: false,
+      status: 403,
+      text: async () =>
+        JSON.stringify({
+          errors: [{ code: 'FORBIDDEN', message: 'Not allowed' }]
+        })
+    }))
+
+    const client = new AppleNewsClient({
+      apiId: 'key-id',
+      apiSecret: Buffer.from('secret').toString('base64'),
+      fetchImpl: fetchMock
+    })
+
+    const error = await client.readChannel({ channelId: 'abc' }).catch((e) => e)
+
+    expect(error).toBeInstanceOf(AppleNewsApiError)
+    expect(error.status).toBe(403)
+    expect(error.apiErrors).toEqual([
+      { code: 'FORBIDDEN', message: 'Not allowed' }
+    ])
   })
 })
-

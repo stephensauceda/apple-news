@@ -252,13 +252,19 @@ export class AppleNewsClient {
       throw new TypeError('articleIds is required and must be an array')
     }
 
-    const body = JSON.stringify({ data: { promotedArticles: options.articleIds } })
-
-    return this.#request('POST', `/sections/${options.sectionId}/promotedArticles`, {
-      date: options.date,
-      contentType: 'application/json',
-      body
+    const body = JSON.stringify({
+      data: { promotedArticles: options.articleIds }
     })
+
+    return this.#request(
+      'POST',
+      `/sections/${options.sectionId}/promotedArticles`,
+      {
+        date: options.date,
+        contentType: 'application/json',
+        body
+      }
+    )
   }
 
   /**
