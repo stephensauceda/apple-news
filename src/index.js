@@ -5,3 +5,5 @@ export {
   buildAuthorizationHeader,
   createSignedHeaders
 } from './auth.js'
+
+export { AppleNewsApiError, buildRequestUrl, requestSigned } from './request.js'
