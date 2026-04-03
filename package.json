@@ -1,0 +1,41 @@
+{
+  "name": "@stephensauceda/apple-news",
+  "version": "0.1.0",
+  "description": "Modern Apple News API client for Node.js",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./helpers": "./dist/helpers.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf dist coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "apple-news",
+    "apple-news-api",
+    "news"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "eslint": "^9.24.0",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.3",
+    "tsup": "^8.4.0",
+    "vitest": "^3.1.1"
+  }
+}
