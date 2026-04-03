@@ -190,3 +190,9 @@ npm run test
 npm run coverage
 npm run build
 ```
+
+## Community
+
+- Contributing guide: see CONTRIBUTING.md
+- Code of Conduct: see CODE_OF_CONDUCT.md
+- Security policy: see SECURITY.md
