@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (for example v0.1.0)'
+        required: true
+        type: string
+
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify tag exists
+        run: |
+          git fetch --tags --force
+          git rev-parse "refs/tags/${{ steps.tag.outputs.value }}" >/dev/null
+
+      - name: Create GitHub Release with generated notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ steps.tag.outputs.value }}" >/dev/null 2>&1 && exit 0
+          gh release create "${{ steps.tag.outputs.value }}" \
+            --title "${{ steps.tag.outputs.value }}" \
+            --generate-notes

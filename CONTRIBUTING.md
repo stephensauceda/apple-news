@@ -60,3 +60,21 @@ Please use the bug report issue template and include:
 ## Questions
 
 Open a discussion or issue if you are unsure before implementing larger changes.
+
+## Releases
+
+This project uses GitHub Releases with auto-generated release notes.
+
+Release flow:
+
+1. Ensure `main` is green (CI passing).
+2. Create and push a version tag in semver format, such as `v0.1.0`:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+3. The `release.yml` workflow creates the GitHub Release and generates notes from merged pull requests.
+
+You can also run the Release workflow manually from the Actions tab by providing a tag.
