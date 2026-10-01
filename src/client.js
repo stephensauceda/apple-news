@@ -25,26 +25,33 @@ function assertId(value, name) {
  * @param {{
  *  isPreview?: boolean,
  *  isSponsored?: boolean,
- *  sections?: unknown,
- *  maturityRating?: string,
+ *  sections?: string[],
+ *  maturityRating?: 'KIDS'|'MATURE'|'GENERAL',
  *  revision?: string
  * }} options
+ * @param {string} host
+ * @param {boolean} includeRevision
  */
-function buildMetadata(options) {
+function buildMetadata(options, host, includeRevision = false) {
   const metadata = {
     isPreview: options.isPreview ?? true,
     isSponsored: options.isSponsored ?? false
   }
 
   if (options.sections !== undefined) {
-    metadata.sections = options.sections
+    metadata.links = {
+      sections: options.sections.map(
+        (sectionId) =>
+          `https://${host}/sections/${encodeURIComponent(sectionId)}`
+      )
+    }
   }
 
   if (options.maturityRating !== undefined) {
     metadata.maturityRating = options.maturityRating
   }
 
-  if (options.revision !== undefined) {
+  if (includeRevision) {
     metadata.revision = options.revision
   }
 
@@ -179,8 +186,8 @@ export class AppleNewsClient {
    *  bundleFiles?: Record<string, { data: Buffer|Uint8Array|string, mimeType?: string }>,
    *  isPreview?: boolean,
    *  isSponsored?: boolean,
-   *  sections?: unknown,
-   *  maturityRating?: string,
+   *  sections?: string[],
+   *  maturityRating?: 'KIDS'|'MATURE'|'GENERAL',
    *  date?: string|Date
    * }} options
    */
@@ -189,7 +196,7 @@ export class AppleNewsClient {
 
     const multipart = buildArticleMultipartBody({
       article: options.article,
-      metadata: buildMetadata(options),
+      metadata: buildMetadata(options, this.host),
       bundleFiles: options.bundleFiles
     })
 
@@ -208,8 +215,8 @@ export class AppleNewsClient {
    *  bundleFiles?: Record<string, { data: Buffer|Uint8Array|string, mimeType?: string }>,
    *  isPreview?: boolean,
    *  isSponsored?: boolean,
-   *  sections?: unknown,
-   *  maturityRating?: string,
+   *  sections?: string[],
+   *  maturityRating?: 'KIDS'|'MATURE'|'GENERAL',
    *  date?: string|Date
    * }} options
    */
@@ -219,7 +226,7 @@ export class AppleNewsClient {
 
     const multipart = buildArticleMultipartBody({
       article: options.article,
-      metadata: buildMetadata(options),
+      metadata: buildMetadata(options, this.host, true),
       bundleFiles: options.bundleFiles
     })
 
