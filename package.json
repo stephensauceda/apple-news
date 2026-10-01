@@ -52,11 +52,11 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@vitest/coverage-v8": "^4.1.2",
+    "@vitest/coverage-v8": "^5.0.3",
     "esbuild": "^0.28.0",
     "eslint": "^10.2.0",
     "globals": "^17.4.0",
     "prettier": "^3.5.3",
-    "vitest": "^4.1.2"
+    "vitest": "^5.0.3"
   }
 }
