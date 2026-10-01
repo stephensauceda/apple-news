@@ -22,20 +22,27 @@ function assertId(value, name) {
 }
 
 /**
- * @param {{
- *  isPreview?: boolean,
- *  isSponsored?: boolean,
- *  sections?: string[],
- *  maturityRating?: 'KIDS'|'MATURE'|'GENERAL',
- *  revision?: string
- * }} options
+ * @typedef {Object} ArticleBundleFile
+ * @property {Buffer|Uint8Array|string} data
+ * @property {string} [mimeType]
+ */
+
+/**
+ * @param {Object} options
+ * @param {boolean} [options.isPreview=true]
+ * @param {boolean} [options.isSponsored=false]
+ * @param {boolean} [options.isPaid=false]
+ * @param {string[]} [options.sections]
+ * @param {'KIDS'|'MATURE'|'GENERAL'} [options.maturityRating]
+ * @param {string} [options.revision]
  * @param {string} host
  * @param {boolean} includeRevision
  */
 function buildMetadata(options, host, includeRevision = false) {
   const metadata = {
     isPreview: options.isPreview ?? true,
-    isSponsored: options.isSponsored ?? false
+    isSponsored: options.isSponsored ?? false,
+    isPaid: options.isPaid ?? false
   }
 
   if (options.sections !== undefined) {
@@ -59,8 +66,13 @@ function buildMetadata(options, host, includeRevision = false) {
 }
 
 /**
+ * @typedef {Object} SharedOptions
+ * @property {string|Date} [date]
+ */
+
+/**
  * @param {Record<string, unknown>|undefined} options
- * @returns {{ date?: string|Date }}
+ * @returns {SharedOptions}
  */
 function getSharedOptions(options) {
   return {
@@ -83,7 +95,9 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ channelId: string, date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.channelId
+   * @param {string|Date} [options.date]
    */
   async readChannel(options) {
     assertId(options?.channelId, 'channelId')
@@ -95,7 +109,9 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ channelId: string, date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.channelId
+   * @param {string|Date} [options.date]
    */
   async listSections(options) {
     assertId(options?.channelId, 'channelId')
@@ -107,7 +123,9 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ sectionId: string, date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.sectionId
+   * @param {string|Date} [options.date]
    */
   async readSection(options) {
     assertId(options?.sectionId, 'sectionId')
@@ -119,7 +137,9 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ articleId: string, date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.articleId
+   * @param {string|Date} [options.date]
    */
   async readArticle(options) {
     assertId(options?.articleId, 'articleId')
@@ -131,7 +151,9 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ articleId: string, date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.articleId
+   * @param {string|Date} [options.date]
    */
   async deleteArticle(options) {
     assertId(options?.articleId, 'articleId')
@@ -143,7 +165,10 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ channelId?: string, sectionId?: string, date?: string|Date, [key: string]: unknown }} options
+   * @param {Record<string, unknown>} options
+   * @param {string} [options.channelId]
+   * @param {string} [options.sectionId]
+   * @param {string|Date} [options.date]
    */
   async searchArticles(options) {
     const hasChannelId =
@@ -180,16 +205,16 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{
-   *  channelId: string,
-   *  article: Record<string, unknown>,
-   *  bundleFiles?: Record<string, { data: Buffer|Uint8Array|string, mimeType?: string }>,
-   *  isPreview?: boolean,
-   *  isSponsored?: boolean,
-   *  sections?: string[],
-   *  maturityRating?: 'KIDS'|'MATURE'|'GENERAL',
-   *  date?: string|Date
-   * }} options
+   * @param {Object} options
+   * @param {string} options.channelId
+   * @param {Record<string, unknown>} options.article
+   * @param {Record<string, ArticleBundleFile>} [options.bundleFiles]
+   * @param {boolean} [options.isPreview=true]
+   * @param {boolean} [options.isSponsored=false]
+   * @param {boolean} [options.isPaid=false]
+   * @param {string[]} [options.sections]
+   * @param {'KIDS'|'MATURE'|'GENERAL'} [options.maturityRating]
+   * @param {string|Date} [options.date]
    */
   async createArticle(options) {
     assertId(options?.channelId, 'channelId')
@@ -208,17 +233,17 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{
-   *  articleId: string,
-   *  revision: string,
-   *  article: Record<string, unknown>,
-   *  bundleFiles?: Record<string, { data: Buffer|Uint8Array|string, mimeType?: string }>,
-   *  isPreview?: boolean,
-   *  isSponsored?: boolean,
-   *  sections?: string[],
-   *  maturityRating?: 'KIDS'|'MATURE'|'GENERAL',
-   *  date?: string|Date
-   * }} options
+   * @param {Object} options
+   * @param {string} options.articleId
+   * @param {string} options.revision
+   * @param {Record<string, unknown>} options.article
+   * @param {Record<string, ArticleBundleFile>} [options.bundleFiles]
+   * @param {boolean} [options.isPreview=true]
+   * @param {boolean} [options.isSponsored=false]
+   * @param {boolean} [options.isPaid=false]
+   * @param {string[]} [options.sections]
+   * @param {'KIDS'|'MATURE'|'GENERAL'} [options.maturityRating]
+   * @param {string|Date} [options.date]
    */
   async updateArticle(options) {
     assertId(options?.articleId, 'articleId')
@@ -238,7 +263,9 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ channelId: string, date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.channelId
+   * @param {string|Date} [options.date]
    */
   async readChannelQuota(options) {
     assertId(options?.channelId, 'channelId')
@@ -250,7 +277,10 @@ export class AppleNewsClient {
   }
 
   /**
-   * @param {{ sectionId: string, articleIds: string[], date?: string|Date }} options
+   * @param {Object} options
+   * @param {string} options.sectionId
+   * @param {string[]} options.articleIds
+   * @param {string|Date} [options.date]
    */
   async promoteArticles(options) {
     assertId(options?.sectionId, 'sectionId')
@@ -277,7 +307,11 @@ export class AppleNewsClient {
   /**
    * @param {string} method
    * @param {string} endpoint
-   * @param {{ date?: string|Date, query?: Record<string, string|number|boolean|undefined>, contentType?: string, body?: string|Buffer|Uint8Array|null }} [options]
+   * @param {Object} [options={}]
+   * @param {string|Date} [options.date]
+   * @param {Record<string, string|number|boolean|undefined>} [options.query]
+   * @param {string} [options.contentType]
+   * @param {string|Buffer|Uint8Array|null} [options.body]
    */
   async #request(method, endpoint, options = {}) {
     return requestSigned({

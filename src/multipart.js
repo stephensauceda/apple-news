@@ -69,12 +69,11 @@ function validateBundleFiles(bundleFiles) {
 }
 
 /**
- * @param {{
- *  article: Record<string, unknown>,
- *  metadata?: Record<string, unknown>,
- *  bundleFiles?: Record<string, BundleFile>,
- *  boundary?: string
- * }} input
+ * @param {Object} input
+ * @param {Record<string, unknown>} input.article
+ * @param {Record<string, unknown>} [input.metadata]
+ * @param {Record<string, BundleFile>} [input.bundleFiles]
+ * @param {string} [input.boundary]
  * @returns {{ contentType: string, body: Buffer }}
  */
 export function buildArticleMultipartBody(input) {

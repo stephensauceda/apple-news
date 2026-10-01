@@ -178,7 +178,7 @@ suite('AppleNewsClient', () => {
     expect(bodyText).toContain('name="metadata"')
     expect(bodyText).toContain('{"identifier":"art1","title":"Title"}')
     expect(bodyText).toContain(
-      '{"data":{"isPreview":true,"isSponsored":false,"links":{"sections":["https://news-api.apple.com/sections/sec1"]}}}'
+      '{"data":{"isPreview":true,"isSponsored":false,"isPaid":false,"links":{"sections":["https://news-api.apple.com/sections/sec1"]}}}'
     )
   })
 
@@ -202,6 +202,7 @@ suite('AppleNewsClient', () => {
       articleId: 'art1',
       revision: 'r1',
       article: { identifier: 'art1', title: 'Updated' },
+      isPaid: true,
       maturityRating: 'GENERAL'
     })
 
@@ -211,6 +212,7 @@ suite('AppleNewsClient', () => {
 
     const bodyText = options.body.toString('utf8')
     expect(bodyText).toContain('"revision":"r1"')
+    expect(bodyText).toContain('"isPaid":true')
     expect(bodyText).toContain('"maturityRating":"GENERAL"')
     expect(bodyText).not.toContain('"sections"')
   })

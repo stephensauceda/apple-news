@@ -6,7 +6,8 @@
 
 /**
  * @param {Record<string, string>} urlMap
- * @param {{ fetchImpl?: typeof fetch }} [options]
+ * @param {Object} [options={}]
+ * @param {typeof fetch} [options.fetchImpl=fetch]
  * @returns {Promise<Record<string, BundleFetchResult>>}
  */
 export async function fetchBundleFiles(urlMap, options = {}) {

@@ -17,7 +17,12 @@ import { createSignedHeaders } from './auth.js'
 export class AppleNewsApiError extends Error {
   /**
    * @param {string} message
-   * @param {{ status: number, method: string, url: string, apiErrors?: unknown[], responseBody?: unknown }} details
+   * @param {Object} details
+   * @param {number} details.status
+   * @param {string} details.method
+   * @param {string} details.url
+   * @param {unknown[]} [details.apiErrors]
+   * @param {unknown} [details.responseBody]
    */
   constructor(message, details) {
     super(message)
