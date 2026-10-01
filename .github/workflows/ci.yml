@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [24]
+        node-version: [22, 24, 26]
 
     steps:
       - name: Checkout
@@ -38,11 +38,11 @@ jobs:
         run: npm run test
 
       - name: Coverage
-        if: matrix.node-version == 24
+        if: matrix.node-version == 26
         run: npm run coverage
 
       - name: Upload coverage to Codecov
-        if: matrix.node-version == 24 && env.CODECOV_TOKEN != ''
+        if: matrix.node-version == 26 && env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v7
         with:
           token: ${{ env.CODECOV_TOKEN }}
