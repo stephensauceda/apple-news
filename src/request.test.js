@@ -1,4 +1,4 @@
-import { suite, expect, test, vi } from 'vitest'
+import { afterEach, suite, expect, test, vi } from 'vitest'
 import { createSignedHeaders } from './auth.js'
 import { AppleNewsApiError, buildRequestUrl, requestSigned } from './request.js'
 
@@ -9,6 +9,8 @@ function createJsonResponse(status, body) {
     text: async () => JSON.stringify(body)
   }
 }
+
+afterEach(() => vi.unstubAllGlobals())
 
 suite('buildRequestUrl', () => {
   test('builds a URL with query string values', () => {
@@ -33,6 +35,7 @@ suite('requestSigned', () => {
     const fetchMock = vi.fn(async () =>
       createJsonResponse(200, { data: { id: '123' } })
     )
+    vi.stubGlobal('fetch', fetchMock)
     const apiSecret = Buffer.from('secret-value').toString('base64')
 
     const result = await requestSigned({
@@ -40,8 +43,7 @@ suite('requestSigned', () => {
       apiSecret,
       method: 'GET',
       endpoint: '/channels/abc',
-      date: '2026-04-03T11:22:33Z',
-      fetchImpl: fetchMock
+      date: '2026-04-03T11:22:33Z'
     })
 
     expect(result).toEqual({ id: '123' })
@@ -62,14 +64,14 @@ suite('requestSigned', () => {
       status: 204,
       text: async () => ''
     }))
+    vi.stubGlobal('fetch', fetchMock)
 
     const result = await requestSigned({
       apiId: 'key-id',
       apiSecret: Buffer.from('secret-value').toString('base64'),
       method: 'DELETE',
       endpoint: '/articles/abc',
-      date: '2026-04-03T11:22:33Z',
-      fetchImpl: fetchMock
+      date: '2026-04-03T11:22:33Z'
     })
 
     expect(result).toBeNull()
@@ -77,6 +79,7 @@ suite('requestSigned', () => {
 
   test('uses full URL including query in signing', async () => {
     const fetchMock = vi.fn(async () => createJsonResponse(200, { data: [] }))
+    vi.stubGlobal('fetch', fetchMock)
     const apiSecret = Buffer.from('secret-value').toString('base64')
 
     await requestSigned({
@@ -85,8 +88,7 @@ suite('requestSigned', () => {
       method: 'GET',
       endpoint: '/channels/abc/articles',
       query: { limit: 5 },
-      date: '2026-04-03T11:22:33Z',
-      fetchImpl: fetchMock
+      date: '2026-04-03T11:22:33Z'
     })
 
     const expected = createSignedHeaders({
@@ -107,6 +109,7 @@ suite('requestSigned', () => {
         errors: [{ code: 'UNAUTHORIZED', message: 'Invalid auth' }]
       })
     )
+    vi.stubGlobal('fetch', fetchMock)
 
     await expect(
       requestSigned({
@@ -114,8 +117,7 @@ suite('requestSigned', () => {
         apiSecret: Buffer.from('secret-value').toString('base64'),
         method: 'GET',
         endpoint: '/channels/abc',
-        date: '2026-04-03T11:22:33Z',
-        fetchImpl: fetchMock
+        date: '2026-04-03T11:22:33Z'
       })
     ).rejects.toMatchObject({
       name: 'AppleNewsApiError',
@@ -128,6 +130,7 @@ suite('requestSigned', () => {
     const fetchMock = vi.fn(async () =>
       createJsonResponse(200, { data: { ok: true } })
     )
+    vi.stubGlobal('fetch', fetchMock)
     const body = JSON.stringify({ headline: 'hello' })
 
     await requestSigned({
@@ -137,8 +140,7 @@ suite('requestSigned', () => {
       endpoint: '/channels/abc/articles',
       date: '2026-04-03T11:22:33Z',
       contentType: 'application/json',
-      body,
-      fetchImpl: fetchMock
+      body
     })
 
     const [, options] = fetchMock.mock.calls[0]
@@ -162,14 +164,14 @@ suite('requestSigned', () => {
       status: 503,
       text: async () => '<html>Service Unavailable</html>'
     }))
+    vi.stubGlobal('fetch', fetchMock)
 
     const error = await requestSigned({
       apiId: 'key-id',
       apiSecret: Buffer.from('secret-value').toString('base64'),
       method: 'GET',
       endpoint: '/channels/abc',
-      date: '2026-04-03T11:22:33Z',
-      fetchImpl: fetchMock
+      date: '2026-04-03T11:22:33Z'
     }).catch((e) => e)
 
     expect(error).toBeInstanceOf(AppleNewsApiError)
@@ -184,14 +186,14 @@ suite('requestSigned', () => {
       status: 200,
       text: async () => JSON.stringify({ throttling: { quota: 5 } })
     }))
+    vi.stubGlobal('fetch', fetchMock)
 
     const result = await requestSigned({
       apiId: 'key-id',
       apiSecret: Buffer.from('secret-value').toString('base64'),
       method: 'GET',
       endpoint: '/channels/abc/quota',
-      date: '2026-04-03T11:22:33Z',
-      fetchImpl: fetchMock
+      date: '2026-04-03T11:22:33Z'
     })
 
     expect(result).toEqual({ throttling: { quota: 5 } })

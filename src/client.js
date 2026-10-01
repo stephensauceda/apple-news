@@ -6,7 +6,6 @@ import { buildArticleMultipartBody } from './multipart.js'
  * @property {string} apiId
  * @property {string} apiSecret
  * @property {string} [host]
- * @property {typeof fetch} [fetchImpl]
  */
 
 function assertRequired(value, name) {
@@ -91,7 +90,6 @@ export class AppleNewsClient {
     this.apiId = config.apiId
     this.apiSecret = config.apiSecret
     this.host = config.host ?? 'news-api.apple.com'
-    this.fetchImpl = config.fetchImpl
   }
 
   /**
@@ -318,7 +316,6 @@ export class AppleNewsClient {
       apiId: this.apiId,
       apiSecret: this.apiSecret,
       host: this.host,
-      fetchImpl: this.fetchImpl,
       method,
       endpoint,
       date: options.date,

@@ -11,7 +11,6 @@ import { createSignedHeaders } from './auth.js'
  * @property {string} [contentType]
  * @property {string|Buffer|Uint8Array|null} [body]
  * @property {string|Date} [date]
- * @property {typeof fetch} [fetchImpl]
  */
 
 export class AppleNewsApiError extends Error {
@@ -106,7 +105,6 @@ function unwrapData(parsed) {
  */
 export async function requestSigned(options) {
   const host = options.host ?? 'news-api.apple.com'
-  const fetchImpl = options.fetchImpl ?? fetch
 
   const url = buildRequestUrl(host, options.endpoint, options.query)
   const signed = createSignedHeaders({
@@ -119,7 +117,7 @@ export async function requestSigned(options) {
     body: options.body
   })
 
-  const response = await fetchImpl(url, {
+  const response = await fetch(url, {
     method: options.method,
     headers: signed.headers,
     body: options.body ?? undefined

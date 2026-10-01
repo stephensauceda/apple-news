@@ -1,4 +1,4 @@
-import { suite, expect, test, vi } from 'vitest'
+import { afterEach, suite, expect, test, vi } from 'vitest'
 import { AppleNewsClient } from './client.js'
 
 function createClientWithResponse(responseBody = { data: { ok: true } }) {
@@ -7,17 +7,19 @@ function createClientWithResponse(responseBody = { data: { ok: true } }) {
     status: 200,
     text: async () => JSON.stringify(responseBody)
   }))
+  vi.stubGlobal('fetch', fetchMock)
 
   const client = new AppleNewsClient({
     apiId: 'key-id',
-    apiSecret: Buffer.from('secret').toString('base64'),
-    fetchImpl: fetchMock
+    apiSecret: Buffer.from('secret').toString('base64')
   })
 
   return { client, fetchMock }
 }
 
 suite('AppleNewsClient', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
   test('requires apiId and apiSecret', () => {
     expect(() => new AppleNewsClient({ apiSecret: 'x' })).toThrow(
       'apiId is required'
@@ -84,10 +86,10 @@ suite('AppleNewsClient', () => {
       status: 204,
       text: async () => ''
     }))
+    vi.stubGlobal('fetch', fetchMock)
     const client = new AppleNewsClient({
       apiId: 'key-id',
-      apiSecret: Buffer.from('secret').toString('base64'),
-      fetchImpl: fetchMock
+      apiSecret: Buffer.from('secret').toString('base64')
     })
 
     const result = await client.deleteArticle({ articleId: 'art1' })
@@ -137,12 +139,12 @@ suite('AppleNewsClient', () => {
       status: 200,
       text: async () => JSON.stringify({ data: { id: 'ok' } })
     }))
+    vi.stubGlobal('fetch', fetchMock)
 
     const client = new AppleNewsClient({
       apiId: 'key-id',
       apiSecret: Buffer.from('secret').toString('base64'),
-      host: 'localhost:8443',
-      fetchImpl: fetchMock
+      host: 'localhost:8443'
     })
 
     await client.readChannel({ channelId: 'abc' })
@@ -309,11 +311,11 @@ suite('AppleNewsClient', () => {
           errors: [{ code: 'FORBIDDEN', message: 'Not allowed' }]
         })
     }))
+    vi.stubGlobal('fetch', fetchMock)
 
     const client = new AppleNewsClient({
       apiId: 'key-id',
-      apiSecret: Buffer.from('secret').toString('base64'),
-      fetchImpl: fetchMock
+      apiSecret: Buffer.from('secret').toString('base64')
     })
 
     const error = await client.readChannel({ channelId: 'abc' }).catch((e) => e)

@@ -6,16 +6,13 @@
 
 /**
  * @param {Record<string, string>} urlMap
- * @param {Object} [options={}]
- * @param {typeof fetch} [options.fetchImpl=fetch]
  * @returns {Promise<Record<string, BundleFetchResult>>}
  */
-export async function fetchBundleFiles(urlMap, options = {}) {
-  const fetchImpl = options.fetchImpl ?? fetch
+export async function fetchBundleFiles(urlMap) {
   const result = {}
 
   for (const [filename, url] of Object.entries(urlMap)) {
-    const response = await fetchImpl(url)
+    const response = await fetch(url)
 
     if (!response.ok) {
       throw new Error(
