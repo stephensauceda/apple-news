@@ -233,7 +233,10 @@ suite('AppleNewsClient', () => {
     const result = await client.createArticle({
       channelId: 'abc',
       article: { identifier: 'art1', title: 'Title' },
-      sections: ['sec1']
+      sections: ['sec1'],
+      isPreview: null,
+      isSponsored: null,
+      isPaid: null
     })
 
     expect(result).toEqual({ id: 'art1' })
@@ -277,6 +280,8 @@ suite('AppleNewsClient', () => {
       articleId: 'art1',
       revision: 'r1',
       article: { identifier: 'art1', title: 'Updated' },
+      isPreview: false,
+      isSponsored: false,
       isPaid: true,
       maturityRating: 'GENERAL'
     })
@@ -290,9 +295,27 @@ suite('AppleNewsClient', () => {
       'Content-Disposition: form-data; name="article.json"; filename="article.json"'
     )
     expect(bodyText).toContain('"revision":"r1"')
+    expect(bodyText).toContain('"isPreview":false')
+    expect(bodyText).toContain('"isSponsored":false')
     expect(bodyText).toContain('"isPaid":true')
     expect(bodyText).toContain('"maturityRating":"GENERAL"')
     expect(bodyText).not.toContain('"sections"')
+  })
+
+  test('updateArticle omits optional metadata that was not provided', async () => {
+    const { client, fetchMock } = createClientWithResponse()
+
+    await client.updateArticle({
+      articleId: 'art1',
+      revision: 'r1',
+      article: { identifier: 'art1', title: 'Updated' }
+    })
+
+    const bodyText = fetchMock.mock.calls[0][1].body.toString('utf8')
+    expect(bodyText).toContain('{"data":{"revision":"r1"}}')
+    expect(bodyText).not.toContain('"isPreview"')
+    expect(bodyText).not.toContain('"isSponsored"')
+    expect(bodyText).not.toContain('"isPaid"')
   })
 
   test('createArticle and updateArticle require ids and article payloads', async () => {

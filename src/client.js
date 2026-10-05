@@ -38,10 +38,26 @@ function assertId(value, name) {
  * @param {boolean} includeRevision
  */
 function buildMetadata(options, host, includeRevision = false) {
-  const metadata = {
-    isPreview: options.isPreview ?? true,
-    isSponsored: options.isSponsored ?? false,
-    isPaid: options.isPaid ?? false
+  const metadata = includeRevision
+    ? {}
+    : {
+        isPreview: options.isPreview ?? true,
+        isSponsored: options.isSponsored ?? false,
+        isPaid: options.isPaid ?? false
+      }
+
+  if (includeRevision) {
+    if (options.isPreview !== undefined) {
+      metadata.isPreview = options.isPreview
+    }
+
+    if (options.isSponsored !== undefined) {
+      metadata.isSponsored = options.isSponsored
+    }
+
+    if (options.isPaid !== undefined) {
+      metadata.isPaid = options.isPaid
+    }
   }
 
   if (options.sections !== undefined) {
@@ -255,9 +271,9 @@ export class AppleNewsClient {
    * @param {string} options.revision
    * @param {Record<string, unknown>} options.article
    * @param {Record<string, ArticleBundleFile>} [options.bundleFiles]
-   * @param {boolean} [options.isPreview=true]
-   * @param {boolean} [options.isSponsored=false]
-   * @param {boolean} [options.isPaid=false]
+   * @param {boolean} [options.isPreview]
+   * @param {boolean} [options.isSponsored]
+   * @param {boolean} [options.isPaid]
    * @param {string[]} [options.sections]
    * @param {'KIDS'|'MATURE'|'GENERAL'} [options.maturityRating]
    * @param {string|Date} [options.date]
