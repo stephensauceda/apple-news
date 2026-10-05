@@ -149,6 +149,7 @@ await client.promoteArticles({ sectionId: 'section-id', articleIds: [] })
 ### updateArticle
 
 revision is required.
+Optional metadata is sent only when provided. To publish an article immediately, pass `isPreview: false`.
 
 ```js
 await client.updateArticle({
