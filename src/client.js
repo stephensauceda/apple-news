@@ -216,7 +216,8 @@ export class AppleNewsClient {
 
     return this.#request('GET', endpoint, {
       date,
-      query
+      query,
+      returnFullResponse: true
     })
   }
 
@@ -328,6 +329,7 @@ export class AppleNewsClient {
    * @param {Record<string, string|number|boolean|undefined>} [options.query]
    * @param {string} [options.contentType]
    * @param {string|Buffer|Uint8Array|null} [options.body]
+   * @param {boolean} [options.returnFullResponse]
    */
   async #request(method, endpoint, options = {}) {
     return requestSigned({
@@ -339,7 +341,8 @@ export class AppleNewsClient {
       date: options.date,
       query: options.query,
       contentType: options.contentType,
-      body: options.body
+      body: options.body,
+      returnFullResponse: options.returnFullResponse
     })
   }
 }

@@ -100,14 +100,12 @@ suite('AppleNewsClient', () => {
 
   test('searchArticles supports channel scope', async () => {
     const responseBody = {
-      data: {
-        articles: [{ id: 'art1' }],
-        links: {
-          self: '/articles?pageSize=5',
-          next: '/articles?pageToken=next'
-        },
-        meta: 'next-page metadata'
-      }
+      data: [{ id: 'art1' }],
+      links: {
+        self: '/articles?pageSize=5',
+        next: '/articles?pageToken=next'
+      },
+      meta: 'next-page metadata'
     }
     const { client, fetchMock } = createClientWithResponse({
       ...responseBody
@@ -121,7 +119,7 @@ suite('AppleNewsClient', () => {
       sortDir: 'ASC'
     })
 
-    expect(result).toEqual(responseBody.data)
+    expect(result).toEqual(responseBody)
 
     const url = new URL(fetchMock.mock.calls[0][0])
     expect(url.pathname).toBe('/channels/abc/articles')
