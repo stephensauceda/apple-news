@@ -94,6 +94,8 @@ await client.deleteArticle({ articleId: 'article-id' })
 ### searchArticles
 
 Provide exactly one of channelId or sectionId.
+Returns the full API response, including `data`, `links.next`, and `meta` for
+pagination.
 
 ```js
 await client.searchArticles({ channelId: 'channel-id', limit: 25 })

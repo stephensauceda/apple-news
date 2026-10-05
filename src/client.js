@@ -167,6 +167,7 @@ export class AppleNewsClient {
    * @param {string} [options.channelId]
    * @param {string} [options.sectionId]
    * @param {string|Date} [options.date]
+   * @returns {Promise<unknown>} Full response, including pagination links and metadata
    */
   async searchArticles(options) {
     const hasChannelId =
@@ -198,7 +199,8 @@ export class AppleNewsClient {
 
     return this.#request('GET', endpoint, {
       date,
-      query
+      query,
+      preserveResponse: true
     })
   }
 
@@ -310,6 +312,7 @@ export class AppleNewsClient {
    * @param {Record<string, string|number|boolean|undefined>} [options.query]
    * @param {string} [options.contentType]
    * @param {string|Buffer|Uint8Array|null} [options.body]
+   * @param {boolean} [options.preserveResponse]
    */
   async #request(method, endpoint, options = {}) {
     return requestSigned({
@@ -321,7 +324,8 @@ export class AppleNewsClient {
       date: options.date,
       query: options.query,
       contentType: options.contentType,
-      body: options.body
+      body: options.body,
+      preserveResponse: options.preserveResponse
     })
   }
 }
