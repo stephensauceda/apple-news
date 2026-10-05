@@ -46,16 +46,18 @@ function buildMetadata(options, host, includeRevision = false) {
         isPaid: options.isPaid ?? false
       }
 
-  if (options.isPreview !== undefined) {
-    metadata.isPreview = options.isPreview
-  }
+  if (includeRevision) {
+    if (options.isPreview !== undefined) {
+      metadata.isPreview = options.isPreview
+    }
 
-  if (options.isSponsored !== undefined) {
-    metadata.isSponsored = options.isSponsored
-  }
+    if (options.isSponsored !== undefined) {
+      metadata.isSponsored = options.isSponsored
+    }
 
-  if (options.isPaid !== undefined) {
-    metadata.isPaid = options.isPaid
+    if (options.isPaid !== undefined) {
+      metadata.isPaid = options.isPaid
+    }
   }
 
   if (options.sections !== undefined) {
@@ -250,9 +252,9 @@ export class AppleNewsClient {
    * @param {string} options.revision
    * @param {Record<string, unknown>} options.article
    * @param {Record<string, ArticleBundleFile>} [options.bundleFiles]
-   * @param {boolean} [options.isPreview=true]
-   * @param {boolean} [options.isSponsored=false]
-   * @param {boolean} [options.isPaid=false]
+   * @param {boolean} [options.isPreview]
+   * @param {boolean} [options.isSponsored]
+   * @param {boolean} [options.isPaid]
    * @param {string[]} [options.sections]
    * @param {'KIDS'|'MATURE'|'GENERAL'} [options.maturityRating]
    * @param {string|Date} [options.date]

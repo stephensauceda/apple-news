@@ -162,7 +162,10 @@ suite('AppleNewsClient', () => {
     const result = await client.createArticle({
       channelId: 'abc',
       article: { identifier: 'art1', title: 'Title' },
-      sections: ['sec1']
+      sections: ['sec1'],
+      isPreview: null,
+      isSponsored: null,
+      isPaid: null
     })
 
     expect(result).toEqual({ id: 'art1' })
