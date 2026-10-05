@@ -11,7 +11,7 @@ import { createSignedHeaders } from './auth.js'
  * @property {string} [contentType]
  * @property {string|Buffer|Uint8Array|null} [body]
  * @property {string|Date} [date]
- * @property {boolean} [preserveResponse]
+ * @property {boolean} [returnFullResponse]
  */
 
 export class AppleNewsApiError extends Error {
@@ -153,5 +153,9 @@ export async function requestSigned(options) {
     return null
   }
 
-  return options.preserveResponse ? parsedBody : unwrapData(parsedBody)
+  if (options.returnFullResponse) {
+    return parsedBody
+  }
+
+  return unwrapData(parsedBody)
 }
