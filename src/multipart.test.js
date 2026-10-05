@@ -2,7 +2,7 @@ import { suite, expect, test } from 'vitest'
 import { buildArticleMultipartBody } from './multipart.js'
 
 suite('buildArticleMultipartBody', () => {
-  test('includes article.json and metadata parts', () => {
+  test('includes article.json as a file and metadata as a JSON field', async () => {
     const result = buildArticleMultipartBody({
       article: { identifier: 'abc', title: 'Title' },
       metadata: { isPreview: true },
@@ -18,6 +18,22 @@ suite('buildArticleMultipartBody', () => {
     expect(text).toContain('name="metadata"')
     expect(text).toContain('{"identifier":"abc","title":"Title"}')
     expect(text).toContain('{"data":{"isPreview":true}}')
+
+    const form = await new Response(result.body, {
+      headers: { 'Content-Type': result.contentType }
+    }).formData()
+    const articleFile = form.get('article.json')
+
+    expect(articleFile.name).toBe('article.json')
+    expect(articleFile.type).toBe('application/json')
+    expect(JSON.parse(await articleFile.text())).toEqual({
+      identifier: 'abc',
+      title: 'Title'
+    })
+    expect(typeof form.get('metadata')).toBe('string')
+    expect(JSON.parse(form.get('metadata'))).toEqual({
+      data: { isPreview: true }
+    })
   })
 
   test('adds bundle files as fileN parts with filenames', () => {

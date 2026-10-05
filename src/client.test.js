@@ -176,7 +176,9 @@ suite('AppleNewsClient', () => {
     expect(Buffer.isBuffer(options.body)).toBe(true)
 
     const bodyText = options.body.toString('utf8')
-    expect(bodyText).toContain('name="article.json"')
+    expect(bodyText).toContain(
+      'Content-Disposition: form-data; name="article.json"; filename="article.json"'
+    )
     expect(bodyText).toContain('name="metadata"')
     expect(bodyText).toContain('{"identifier":"art1","title":"Title"}')
     expect(bodyText).toContain(
@@ -213,6 +215,9 @@ suite('AppleNewsClient', () => {
     expect(options.method).toBe('POST')
 
     const bodyText = options.body.toString('utf8')
+    expect(bodyText).toContain(
+      'Content-Disposition: form-data; name="article.json"; filename="article.json"'
+    )
     expect(bodyText).toContain('"revision":"r1"')
     expect(bodyText).toContain('"isPaid":true')
     expect(bodyText).toContain('"maturityRating":"GENERAL"')

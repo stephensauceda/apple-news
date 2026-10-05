@@ -92,7 +92,8 @@ export function buildArticleMultipartBody(input) {
       boundary,
       'article.json',
       Buffer.from(JSON.stringify(input.article), 'utf8'),
-      'application/json'
+      'application/json',
+      'article.json'
     )
   )
 
