@@ -131,6 +131,21 @@ suite('AppleNewsClient', () => {
     })
   })
 
+  test('searchArticles preserves pagination links and metadata', async () => {
+    const response = {
+      data: { articles: [{ id: 'art1' }] },
+      links: {
+        next: 'https://news-api.apple.com/channels/abc/articles?pageToken=next'
+      },
+      meta: { pageToken: 'next' }
+    }
+    const { client } = createClientWithResponse(response)
+
+    const result = await client.searchArticles({ channelId: 'abc' })
+
+    expect(result).toEqual(response)
+  })
+
   test('searchArticles supports section scope', async () => {
     const { client, fetchMock } = createClientWithResponse({
       data: [{ id: 'art1' }]

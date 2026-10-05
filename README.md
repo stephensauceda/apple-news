@@ -99,8 +99,8 @@ sent, allowing Apple News to apply its documented defaults. `pageSize` must be
 an integer from 1 to 100; `pageToken` is an opaque pagination token; `fromDate`
 and `toDate` use ISO 8601; `sortDir` is `ASC` or `DESC`. Additional query
 options are passed through for forward compatibility. The returned search
-response includes the API's `articles`, `links`, and `meta` fields when
-provided.
+response preserves the full API response, including its `articles`, `links`,
+and `meta` fields when provided.
 The optional `date` is the HHMAC request-signing timestamp, not a search filter.
 
 ```js

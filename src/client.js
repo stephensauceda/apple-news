@@ -188,7 +188,7 @@ export class AppleNewsClient {
    * @param {string} [options.toDate] ISO 8601 upper bound
    * @param {'ASC'|'DESC'} [options.sortDir]
    * @param {string|Date} [options.date] HHMAC signing timestamp, not a filter
-   * @returns {Promise<Record<string, unknown>>} Search response with articles and metadata
+   * @returns {Promise<Record<string, unknown>>} Full search response, including pagination metadata
    */
   async searchArticles(options) {
     if (!options?.channelId && !options?.sectionId) {
