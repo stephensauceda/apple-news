@@ -182,27 +182,45 @@ export class AppleNewsClient {
    * @param {Record<string, unknown>} options
    * @param {string} [options.channelId]
    * @param {string} [options.sectionId]
-   * @param {string|Date} [options.date]
+   * @param {number} [options.pageSize] An integer from 1 to 100
+   * @param {string} [options.pageToken] Opaque token from a previous response
+   * @param {string} [options.fromDate] ISO 8601 lower bound
+   * @param {string} [options.toDate] ISO 8601 upper bound
+   * @param {'ASC'|'DESC'} [options.sortDir]
+   * @param {string|Date} [options.date] HHMAC signing timestamp, not a filter
+   * @returns {Promise<Record<string, unknown>>} Search response with articles and metadata
    */
   async searchArticles(options) {
-    const hasChannelId =
-      typeof options?.channelId === 'string' && options.channelId.length > 0
-    const hasSectionId =
-      typeof options?.sectionId === 'string' && options.sectionId.length > 0
-
-    if (!hasChannelId && !hasSectionId) {
+    if (!options?.channelId && !options?.sectionId) {
       throw new TypeError(
         'searchArticles requires either channelId or sectionId'
       )
     }
 
-    if (hasChannelId && hasSectionId) {
+    if (options.channelId && options.sectionId) {
       throw new TypeError(
         'searchArticles accepts either channelId or sectionId, not both'
       )
     }
 
-    const endpoint = hasChannelId
+    if (
+      options.pageSize !== undefined &&
+      (!Number.isInteger(options.pageSize) ||
+        options.pageSize < 1 ||
+        options.pageSize > 100)
+    ) {
+      throw new TypeError('pageSize must be an integer between 1 and 100')
+    }
+
+    if (
+      options.sortDir !== undefined &&
+      options.sortDir !== 'ASC' &&
+      options.sortDir !== 'DESC'
+    ) {
+      throw new TypeError('sortDir must be either ASC or DESC')
+    }
+
+    const endpoint = options.channelId
       ? `/channels/${options.channelId}/articles`
       : `/sections/${options.sectionId}/articles`
 
@@ -214,7 +232,8 @@ export class AppleNewsClient {
 
     return this.#request('GET', endpoint, {
       date,
-      query
+      query,
+      returnFullResponse: true
     })
   }
 
@@ -326,6 +345,7 @@ export class AppleNewsClient {
    * @param {Record<string, string|number|boolean|undefined>} [options.query]
    * @param {string} [options.contentType]
    * @param {string|Buffer|Uint8Array|null} [options.body]
+   * @param {boolean} [options.returnFullResponse]
    */
   async #request(method, endpoint, options = {}) {
     return requestSigned({
@@ -337,7 +357,8 @@ export class AppleNewsClient {
       date: options.date,
       query: options.query,
       contentType: options.contentType,
-      body: options.body
+      body: options.body,
+      returnFullResponse: options.returnFullResponse
     })
   }
 }

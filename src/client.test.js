@@ -99,15 +99,36 @@ suite('AppleNewsClient', () => {
   })
 
   test('searchArticles supports channel scope', async () => {
+    const responseBody = {
+      articles: [{ id: 'art1' }],
+      links: {
+        self: '/articles?pageSize=5',
+        next: '/articles?pageToken=next'
+      },
+      meta: 'next-page metadata'
+    }
     const { client, fetchMock } = createClientWithResponse({
-      data: [{ id: 'art1' }]
+      ...responseBody
     })
 
-    await client.searchArticles({ channelId: 'abc', limit: 5 })
+    const result = await client.searchArticles({
+      channelId: 'abc',
+      pageSize: 5,
+      fromDate: '2026-01-01T00:00:00Z',
+      toDate: '2026-02-01T00:00:00Z',
+      sortDir: 'ASC'
+    })
 
-    expect(fetchMock.mock.calls[0][0]).toBe(
-      'https://news-api.apple.com/channels/abc/articles?limit=5'
-    )
+    expect(result).toEqual(responseBody)
+
+    const url = new URL(fetchMock.mock.calls[0][0])
+    expect(url.pathname).toBe('/channels/abc/articles')
+    expect(Object.fromEntries(url.searchParams)).toEqual({
+      pageSize: '5',
+      fromDate: '2026-01-01T00:00:00Z',
+      toDate: '2026-02-01T00:00:00Z',
+      sortDir: 'ASC'
+    })
   })
 
   test('searchArticles supports section scope', async () => {
@@ -115,11 +136,58 @@ suite('AppleNewsClient', () => {
       data: [{ id: 'art1' }]
     })
 
-    await client.searchArticles({ sectionId: 'sec1', offset: 10 })
+    await client.searchArticles({ sectionId: 'sec1', pageToken: 'next-page' })
 
     expect(fetchMock.mock.calls[0][0]).toBe(
-      'https://news-api.apple.com/sections/sec1/articles?offset=10'
+      'https://news-api.apple.com/sections/sec1/articles?pageToken=next-page'
     )
+  })
+
+  test('searchArticles omits absent query options and does not apply defaults', async () => {
+    const { client, fetchMock } = createClientWithResponse()
+
+    await client.searchArticles({ sectionId: 'sec1' })
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      'https://news-api.apple.com/sections/sec1/articles'
+    )
+  })
+
+  test('searchArticles forwards future query options and uses date only for signing', async () => {
+    const { client, fetchMock } = createClientWithResponse()
+
+    await client.searchArticles({
+      channelId: 'abc',
+      futureFilter: 'enabled',
+      date: '2026-04-03T12:00:00Z'
+    })
+
+    const [url, options] = fetchMock.mock.calls[0]
+    expect(url).toBe(
+      'https://news-api.apple.com/channels/abc/articles?futureFilter=enabled'
+    )
+    expect(options.headers.Authorization).toContain(
+      'date="2026-04-03T12:00:00Z"'
+    )
+  })
+
+  test('searchArticles validates pageSize and sortDir', async () => {
+    const { client, fetchMock } = createClientWithResponse()
+
+    await expect(
+      client.searchArticles({ channelId: 'abc', pageSize: 0 })
+    ).rejects.toThrow('pageSize must be an integer between 1 and 100')
+    await expect(
+      client.searchArticles({ channelId: 'abc', pageSize: 101 })
+    ).rejects.toThrow('pageSize must be an integer between 1 and 100')
+    await expect(
+      client.searchArticles({ channelId: 'abc', pageSize: 1.5 })
+    ).rejects.toThrow('pageSize must be an integer between 1 and 100')
+    await expect(
+      client.searchArticles({ channelId: 'abc', sortDir: 'asc' })
+    ).rejects.toThrow('sortDir must be either ASC or DESC')
+
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 
   test('searchArticles requires exactly one scope id', async () => {
@@ -128,6 +196,9 @@ suite('AppleNewsClient', () => {
     await expect(client.searchArticles({})).rejects.toThrow(
       'requires either channelId or sectionId'
     )
+    await expect(
+      client.searchArticles({ channelId: '', sectionId: '' })
+    ).rejects.toThrow('requires either channelId or sectionId')
     await expect(
       client.searchArticles({ channelId: 'abc', sectionId: 'sec1' })
     ).rejects.toThrow('accepts either channelId or sectionId, not both')
