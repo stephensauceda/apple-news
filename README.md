@@ -94,10 +94,22 @@ await client.deleteArticle({ articleId: 'article-id' })
 ### searchArticles
 
 Provide exactly one of channelId or sectionId.
+Search query parameters follow Apple News API names. Omitted parameters are not
+sent, allowing Apple News to apply its documented defaults. `pageSize` must be
+an integer from 1 to 100; `pageToken` is an opaque pagination token; `fromDate`
+and `toDate` use ISO 8601; `sortDir` is `ASC` or `DESC`. Additional query
+options are passed through for forward compatibility. The returned search data
+includes the API's `articles`, `links`, and `meta` fields when provided.
+The optional `date` is the HHMAC request-signing timestamp, not a search filter.
 
 ```js
-await client.searchArticles({ channelId: 'channel-id', limit: 25 })
-await client.searchArticles({ sectionId: 'section-id', offset: 50 })
+await client.searchArticles({ channelId: 'channel-id', pageSize: 25 })
+await client.searchArticles({
+  sectionId: 'section-id',
+  fromDate: '2026-01-01T00:00:00Z',
+  toDate: '2026-02-01T00:00:00Z',
+  sortDir: 'ASC'
+})
 ```
 
 ### createArticle
