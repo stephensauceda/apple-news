@@ -100,7 +100,7 @@ suite('AppleNewsClient', () => {
 
   test('searchArticles supports channel scope', async () => {
     const responseBody = {
-      data: [{ id: 'art1' }],
+      articles: [{ id: 'art1' }],
       links: {
         self: '/articles?pageSize=5',
         next: '/articles?pageToken=next'
