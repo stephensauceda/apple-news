@@ -1,6 +1,6 @@
 {
   "name": "@stephensauceda/apple-news",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Modern Apple News API client for Node.js",
   "author": "Stephen Sauceda",
   "type": "module",
