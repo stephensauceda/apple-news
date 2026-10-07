@@ -63,6 +63,20 @@ function getApiErrors(parsed) {
 }
 
 /**
+ * @param {unknown[]|undefined} apiErrors
+ * @returns {string|undefined}
+ */
+function getApiErrorCode(apiErrors) {
+  const firstApiError = apiErrors?.[0]
+  if (!isObject(firstApiError) || typeof firstApiError.code !== 'string') {
+    return undefined
+  }
+
+  const code = firstApiError.code.trim()
+  return code.length > 0 ? code : undefined
+}
+
+/**
  * @param {unknown} parsed
  * @returns {unknown}
  */
@@ -118,16 +132,15 @@ export async function requestSigned(options) {
   if (!response.ok) {
     const apiErrors = getApiErrors(parsedBody)
     const ApiError = getAppleNewsApiErrorClass(response.status)
-    throw new ApiError(
-      `${options.method.toUpperCase()} ${options.endpoint} failed with status ${response.status}`,
-      {
-        status: response.status,
-        method: options.method.toUpperCase(),
-        url,
-        apiErrors,
-        responseBody: parsedBody
-      }
-    )
+    const message = `${options.method.toUpperCase()} ${options.endpoint} failed with status ${response.status}`
+    const apiErrorCode = getApiErrorCode(apiErrors)
+    throw new ApiError(apiErrorCode ? `${message}: ${apiErrorCode}` : message, {
+      status: response.status,
+      method: options.method.toUpperCase(),
+      url,
+      apiErrors,
+      responseBody: parsedBody
+    })
   }
 
   if (parsedBody === null) {

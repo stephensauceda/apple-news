@@ -125,9 +125,24 @@ suite('requestSigned', () => {
     [418, AppleNewsApiError]
   ])('classifies status %i as %s', async (status, ErrorClass) => {
     const responseBody = {
-      errors: [{ code: 'API_ERROR', message: 'Request failed' }]
+      errors: [
+        {
+          code: 'API_ERROR',
+          message: 'Sensitive response message',
+          keyPath: 'article.title',
+          value: 'Sensitive value'
+        },
+        {
+          code: 'SECOND_ERROR',
+          message: 'Another response message',
+          keyPath: 'article.body',
+          value: 'Another sensitive value'
+        }
+      ]
     }
-    const fetchMock = vi.fn(async () => createJsonResponse(status, responseBody))
+    const fetchMock = vi.fn(async () =>
+      createJsonResponse(status, responseBody)
+    )
     vi.stubGlobal('fetch', fetchMock)
 
     const error = await requestSigned({
@@ -144,7 +159,41 @@ suite('requestSigned', () => {
     expect(error.status).toBe(status)
     expect(error.apiErrors).toEqual(responseBody.errors)
     expect(error.responseBody).toEqual(responseBody)
+    expect(error.message).toBe(
+      `GET /channels/abc failed with status ${status}: API_ERROR`
+    )
   })
+
+  test.each([42, '   '])(
+    'omits a missing or invalid API error code from the message',
+    async (code) => {
+      const fetchMock = vi.fn(async () =>
+        createJsonResponse(400, {
+          errors: [
+            {
+              code,
+              message: 'Sensitive response message',
+              keyPath: 'article.title',
+              value: 'Sensitive value'
+            }
+          ]
+        })
+      )
+      vi.stubGlobal('fetch', fetchMock)
+
+      const error = await requestSigned({
+        apiId: 'key-id',
+        apiSecret: Buffer.from('secret-value').toString('base64'),
+        method: 'POST',
+        endpoint: '/articles',
+        date: '2026-04-03T11:22:33Z'
+      }).catch((caughtError) => caughtError)
+
+      expect(error.message).toBe('POST /articles failed with status 400')
+      expect(error.message).not.toContain('Sensitive')
+      expect(error.message).not.toContain('article.title')
+    }
+  )
 
   test('exports categorized errors from the package entry point', () => {
     expect(packageExports.AppleNewsValidationError).toBe(
