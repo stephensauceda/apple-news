@@ -67,13 +67,18 @@ function getApiErrors(parsed) {
  * @returns {string|undefined}
  */
 function getApiErrorCode(apiErrors) {
-  const firstApiError = apiErrors?.[0]
-  if (!isObject(firstApiError) || typeof firstApiError.code !== 'string') {
-    return undefined
+  for (const apiError of apiErrors ?? []) {
+    if (!isObject(apiError) || typeof apiError.code !== 'string') {
+      continue
+    }
+
+    const code = apiError.code.trim()
+    if (code.length > 0) {
+      return code
+    }
   }
 
-  const code = firstApiError.code.trim()
-  return code.length > 0 ? code : undefined
+  return undefined
 }
 
 /**
