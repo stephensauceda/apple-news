@@ -3,11 +3,11 @@ import { createSignedHeaders } from './auth.js'
 import {
   AppleNewsApiError,
   AppleNewsAuthError,
+  AppleNewsBadRequestError,
   AppleNewsConflictError,
   AppleNewsNotFoundError,
   AppleNewsRateLimitError,
-  AppleNewsServiceError,
-  AppleNewsValidationError
+  AppleNewsServiceError
 } from './errors.js'
 import { buildRequestUrl, requestSigned } from './request.js'
 import * as packageExports from './index.js'
@@ -114,7 +114,7 @@ suite('requestSigned', () => {
   })
 
   test.each([
-    [400, AppleNewsValidationError],
+    [400, AppleNewsBadRequestError],
     [401, AppleNewsAuthError],
     [403, AppleNewsAuthError],
     [404, AppleNewsNotFoundError],
@@ -196,9 +196,10 @@ suite('requestSigned', () => {
   )
 
   test('exports categorized errors from the package entry point', () => {
-    expect(packageExports.AppleNewsValidationError).toBe(
-      AppleNewsValidationError
+    expect(packageExports.AppleNewsBadRequestError).toBe(
+      AppleNewsBadRequestError
     )
+    expect(packageExports).not.toHaveProperty('AppleNewsValidationError')
     expect(packageExports.AppleNewsAuthError).toBe(AppleNewsAuthError)
     expect(packageExports.AppleNewsNotFoundError).toBe(AppleNewsNotFoundError)
     expect(packageExports.AppleNewsConflictError).toBe(AppleNewsConflictError)

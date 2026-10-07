@@ -201,7 +201,7 @@ const bundleFiles = await fetchBundleFiles({
 
 Non-2xx responses throw an `AppleNewsApiError` subclass based on status:
 
-- 400: `AppleNewsValidationError`
+- 400: `AppleNewsBadRequestError`
 - 401/403: `AppleNewsAuthError`
 - 404: `AppleNewsNotFoundError`
 - 409: `AppleNewsConflictError`

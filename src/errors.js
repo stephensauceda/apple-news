@@ -19,7 +19,7 @@ export class AppleNewsApiError extends Error {
   }
 }
 
-export class AppleNewsValidationError extends AppleNewsApiError {}
+export class AppleNewsBadRequestError extends AppleNewsApiError {}
 export class AppleNewsAuthError extends AppleNewsApiError {}
 export class AppleNewsNotFoundError extends AppleNewsApiError {}
 export class AppleNewsConflictError extends AppleNewsApiError {}
@@ -32,7 +32,7 @@ export class AppleNewsServiceError extends AppleNewsApiError {}
  */
 export function getAppleNewsApiErrorClass(status) {
   if (status === 400) {
-    return AppleNewsValidationError
+    return AppleNewsBadRequestError
   }
 
   if (status === 401 || status === 403) {
