@@ -9,11 +9,11 @@ export {
 export {
   AppleNewsApiError,
   AppleNewsAuthError,
+  AppleNewsBadRequestError,
   AppleNewsConflictError,
   AppleNewsNotFoundError,
   AppleNewsRateLimitError,
-  AppleNewsServiceError,
-  AppleNewsValidationError
+  AppleNewsServiceError
 } from './errors.js'
 export { buildRequestUrl, requestSigned } from './request.js'
 export { AppleNewsClient } from './client.js'
