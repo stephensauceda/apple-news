@@ -1,6 +1,16 @@
 import { afterEach, suite, expect, test, vi } from 'vitest'
 import { createSignedHeaders } from './auth.js'
-import { AppleNewsApiError, buildRequestUrl, requestSigned } from './request.js'
+import {
+  AppleNewsApiError,
+  AppleNewsAuthError,
+  AppleNewsConflictError,
+  AppleNewsNotFoundError,
+  AppleNewsRateLimitError,
+  AppleNewsServiceError,
+  AppleNewsValidationError
+} from './errors.js'
+import { buildRequestUrl, requestSigned } from './request.js'
+import * as packageExports from './index.js'
 
 function createJsonResponse(status, body) {
   return {
@@ -103,27 +113,97 @@ suite('requestSigned', () => {
     expect(options.headers.Authorization).toBe(expected.headers.Authorization)
   })
 
-  test('throws AppleNewsApiError for non-2xx responses', async () => {
+  test.each([
+    [400, AppleNewsValidationError],
+    [401, AppleNewsAuthError],
+    [403, AppleNewsAuthError],
+    [404, AppleNewsNotFoundError],
+    [409, AppleNewsConflictError],
+    [429, AppleNewsRateLimitError],
+    [500, AppleNewsServiceError],
+    [599, AppleNewsServiceError],
+    [418, AppleNewsApiError]
+  ])('classifies status %i as %s', async (status, ErrorClass) => {
+    const responseBody = {
+      errors: [
+        {
+          code: 'API_ERROR',
+          message: 'Sensitive response message',
+          keyPath: 'article.title',
+          value: 'Sensitive value'
+        },
+        {
+          code: 'SECOND_ERROR',
+          message: 'Another response message',
+          keyPath: 'article.body',
+          value: 'Another sensitive value'
+        }
+      ]
+    }
     const fetchMock = vi.fn(async () =>
-      createJsonResponse(401, {
-        errors: [{ code: 'UNAUTHORIZED', message: 'Invalid auth' }]
-      })
+      createJsonResponse(status, responseBody)
     )
     vi.stubGlobal('fetch', fetchMock)
 
-    await expect(
-      requestSigned({
+    const error = await requestSigned({
+      apiId: 'key-id',
+      apiSecret: Buffer.from('secret-value').toString('base64'),
+      method: 'GET',
+      endpoint: '/channels/abc',
+      date: '2026-04-03T11:22:33Z'
+    }).catch((caughtError) => caughtError)
+
+    expect(error).toBeInstanceOf(ErrorClass)
+    expect(error).toBeInstanceOf(AppleNewsApiError)
+    expect(error.name).toBe(ErrorClass.name)
+    expect(error.status).toBe(status)
+    expect(error.apiErrors).toEqual(responseBody.errors)
+    expect(error.responseBody).toEqual(responseBody)
+    expect(error.message).toBe(
+      `GET /channels/abc failed with status ${status}: API_ERROR`
+    )
+  })
+
+  test.each([42, '   '])(
+    'omits a missing or invalid API error code from the message',
+    async (code) => {
+      const fetchMock = vi.fn(async () =>
+        createJsonResponse(400, {
+          errors: [
+            {
+              code,
+              message: 'Sensitive response message',
+              keyPath: 'article.title',
+              value: 'Sensitive value'
+            }
+          ]
+        })
+      )
+      vi.stubGlobal('fetch', fetchMock)
+
+      const error = await requestSigned({
         apiId: 'key-id',
         apiSecret: Buffer.from('secret-value').toString('base64'),
-        method: 'GET',
-        endpoint: '/channels/abc',
+        method: 'POST',
+        endpoint: '/articles',
         date: '2026-04-03T11:22:33Z'
-      })
-    ).rejects.toMatchObject({
-      name: 'AppleNewsApiError',
-      status: 401,
-      method: 'GET'
-    })
+      }).catch((caughtError) => caughtError)
+
+      expect(error.message).toBe('POST /articles failed with status 400')
+      expect(error.message).not.toContain('Sensitive')
+      expect(error.message).not.toContain('article.title')
+    }
+  )
+
+  test('exports categorized errors from the package entry point', () => {
+    expect(packageExports.AppleNewsValidationError).toBe(
+      AppleNewsValidationError
+    )
+    expect(packageExports.AppleNewsAuthError).toBe(AppleNewsAuthError)
+    expect(packageExports.AppleNewsNotFoundError).toBe(AppleNewsNotFoundError)
+    expect(packageExports.AppleNewsConflictError).toBe(AppleNewsConflictError)
+    expect(packageExports.AppleNewsRateLimitError).toBe(AppleNewsRateLimitError)
+    expect(packageExports.AppleNewsServiceError).toBe(AppleNewsServiceError)
   })
 
   test('passes content type and body for POST requests', async () => {

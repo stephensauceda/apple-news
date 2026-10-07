@@ -415,7 +415,7 @@ suite('AppleNewsClient', () => {
   })
 
   test('propagates AppleNewsApiError from failed API responses', async () => {
-    const { AppleNewsApiError } = await import('./request.js')
+    const { AppleNewsApiError } = await import('./errors.js')
 
     const fetchMock = vi.fn(async () => ({
       ok: false,

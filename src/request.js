@@ -1,4 +1,5 @@
 import { createSignedHeaders } from './auth.js'
+import { getAppleNewsApiErrorClass } from './errors.js'
 
 /**
  * @typedef RequestOptions
@@ -13,27 +14,6 @@ import { createSignedHeaders } from './auth.js'
  * @property {string|Date} [date]
  * @property {boolean} [returnFullResponse]
  */
-
-export class AppleNewsApiError extends Error {
-  /**
-   * @param {string} message
-   * @param {Object} details
-   * @param {number} details.status
-   * @param {string} details.method
-   * @param {string} details.url
-   * @param {unknown[]} [details.apiErrors]
-   * @param {unknown} [details.responseBody]
-   */
-  constructor(message, details) {
-    super(message)
-    this.name = 'AppleNewsApiError'
-    this.status = details.status
-    this.method = details.method
-    this.url = details.url
-    this.apiErrors = details.apiErrors
-    this.responseBody = details.responseBody
-  }
-}
 
 /**
  * @param {string} host
@@ -80,6 +60,25 @@ function getApiErrors(parsed) {
   }
 
   return maybeErrors
+}
+
+/**
+ * @param {unknown[]|undefined} apiErrors
+ * @returns {string|undefined}
+ */
+function getApiErrorCode(apiErrors) {
+  for (const apiError of apiErrors ?? []) {
+    if (!isObject(apiError) || typeof apiError.code !== 'string') {
+      continue
+    }
+
+    const code = apiError.code.trim()
+    if (code.length > 0) {
+      return code
+    }
+  }
+
+  return undefined
 }
 
 /**
@@ -137,16 +136,16 @@ export async function requestSigned(options) {
 
   if (!response.ok) {
     const apiErrors = getApiErrors(parsedBody)
-    throw new AppleNewsApiError(
-      `${options.method.toUpperCase()} ${options.endpoint} failed with status ${response.status}`,
-      {
-        status: response.status,
-        method: options.method.toUpperCase(),
-        url,
-        apiErrors,
-        responseBody: parsedBody
-      }
-    )
+    const ApiError = getAppleNewsApiErrorClass(response.status)
+    const message = `${options.method.toUpperCase()} ${options.endpoint} failed with status ${response.status}`
+    const apiErrorCode = getApiErrorCode(apiErrors)
+    throw new ApiError(apiErrorCode ? `${message}: ${apiErrorCode}` : message, {
+      status: response.status,
+      method: options.method.toUpperCase(),
+      url,
+      apiErrors,
+      responseBody: parsedBody
+    })
   }
 
   if (parsedBody === null) {
