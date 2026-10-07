@@ -199,7 +199,17 @@ const bundleFiles = await fetchBundleFiles({
 
 ## Error Handling
 
-Non-2xx responses throw AppleNewsApiError with:
+Non-2xx responses throw an `AppleNewsApiError` subclass based on status:
+
+- 400: `AppleNewsValidationError`
+- 401/403: `AppleNewsAuthError`
+- 404: `AppleNewsNotFoundError`
+- 409: `AppleNewsConflictError`
+- 429: `AppleNewsRateLimitError`
+- 5xx: `AppleNewsServiceError`
+- Other statuses: `AppleNewsApiError`
+
+Every subclass extends `AppleNewsApiError` and includes:
 
 - status
 - method
