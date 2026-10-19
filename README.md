@@ -1,7 +1,7 @@
-# @stephensauceda/apple-news
+# @stphn.dev/apple-news
 
-[![CI](https://github.com/stephensauceda/apple-news/actions/workflows/ci.yml/badge.svg)](https://github.com/stephensauceda/apple-news/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/github/stephensauceda/apple-news/graph/badge.svg?token=CWIFXDRP77)](https://codecov.io/github/stephensauceda/apple-news)
+[![CI](https://github.com/stphn-dev/apple-news/actions/workflows/ci.yml/badge.svg)](https://github.com/stphn-dev/apple-news/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/stphn-dev/apple-news/graph/badge.svg?token=CWIFXDRP77)](https://codecov.io/github/stphn-dev/apple-news)
 
 Modern Node.js client for the Apple News API.
 
@@ -14,7 +14,7 @@ Modern Node.js client for the Apple News API.
 ## Installation
 
 ```bash
-npm install @stephensauceda/apple-news
+npm install @stphn.dev/apple-news
 ```
 
 ## Requirements
@@ -25,7 +25,7 @@ npm install @stephensauceda/apple-news
 ## Quick Start
 
 ```js
-import { AppleNewsClient } from '@stephensauceda/apple-news'
+import { AppleNewsClient } from '@stphn.dev/apple-news'
 
 const client = new AppleNewsClient({
   apiId: process.env.APPLE_NEWS_API_ID,
@@ -128,9 +128,7 @@ await client.createArticle({
   maturityRating: 'GENERAL',
   bundleFiles: {
     'image.jpg': {
-      data: Buffer.from([
-        /* bytes */
-      ]),
+      data: Buffer.from([/* bytes */]),
       mimeType: 'image/jpeg'
     }
   }
@@ -174,9 +172,7 @@ await client.updateArticle({
   },
   bundleFiles: {
     'image.jpg': {
-      data: Buffer.from([
-        /* bytes */
-      ]),
+      data: Buffer.from([/* bytes */]),
       mimeType: 'image/jpeg'
     }
   }
@@ -189,7 +185,7 @@ Core upload behavior expects buffer/file payloads for deterministic multipart si
 If you want convenience URL downloading, use the helper:
 
 ```js
-import { fetchBundleFiles } from '@stephensauceda/apple-news'
+import { fetchBundleFiles } from '@stphn.dev/apple-news'
 
 const bundleFiles = await fetchBundleFiles({
   'image.jpg': 'https://example.com/image.jpg',
@@ -218,7 +214,7 @@ Every subclass extends `AppleNewsApiError` and includes:
 - responseBody
 
 ```js
-import { AppleNewsApiError } from '@stephensauceda/apple-news'
+import { AppleNewsApiError } from '@stphn.dev/apple-news'
 
 try {
   await client.readChannel({ channelId: 'channel-id' })
