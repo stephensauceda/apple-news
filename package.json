@@ -1,6 +1,6 @@
 {
-  "name": "@stephensauceda/apple-news",
-  "version": "4.0.0",
+  "name": "@stphn.dev/apple-news",
+  "version": "4.0.1",
   "description": "Modern Apple News API client for Node.js",
   "author": "Stephen Sauceda",
   "type": "module",
@@ -12,12 +12,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stephensauceda/apple-news.git"
+    "url": "git+https://github.com/stphn-dev/apple-news.git"
   },
   "bugs": {
-    "url": "https://github.com/stephensauceda/apple-news/issues"
+    "url": "https://github.com/stphn-dev/apple-news/issues"
   },
-  "homepage": "https://github.com/stephensauceda/apple-news#readme",
+  "homepage": "https://github.com/stphn-dev/apple-news#readme",
   "funding": {
     "type": "github",
     "url": "https://github.com/sponsors/stephensauceda"
